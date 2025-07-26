@@ -21,7 +21,7 @@ class MemberFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'full_name' => fake()->name(),
             'photo_url' => fake()->imageUrl(200, 200, 'people', true),
             'payment_date_membership' => now(),
             'membership_term_gym_access' => fake()->numberBetween(1, 12), // Random number between 1-12 months
@@ -35,7 +35,7 @@ class MemberFactory extends Factory
             'id_number'=>fake()->numberBetween(100000, 999999),
             'email'=>fake()->email(),
             'phone_number'=>fake()->phoneNumber(),
-            'contact_person'=>fake()->name(),
+            'emergency_contact_person'=>fake()->name(),
             'emergency_contact_number'=>fake()->phoneNumber(),
             'weight_kg'=>fake()->numberBetween(50, 200),
             'height_cm'=>fake()->numberBetween(150, 250),

@@ -1,15 +1,26 @@
 <x-layout>
     <div class="bg-white shadow-md rounded-lg p-6 mb-8">
         <!-- Back button -->
-        <a href="{{ route('members.index') }}" class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
+        <a href="{{ route('manage-members.index') }}" class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
             Back
         </a>
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Register New Member</h1>
+
+        @if ($errors->any())
+            <div class="mb-4">
+                <div class="text-red-600 font-semibold">Please fix the following errors:</div>
+                <ul class="list-disc list-inside text-red-500">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         
-        <form action="#" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{route('add-member')}}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             <!-- Photo Upload -->
             <div class="bg-gray-50 p-6 rounded-lg mb-6">
@@ -82,6 +93,26 @@
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+                    <!-- Weight (Kg) -->
+                    <div>
+                        <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">Weight (kg) <span class="text-red-500">*</span></label>
+                        <input type="number" id="weight" name="weight"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               value="{{ old('weight') }}">
+                        @error('weight')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <!-- Height (cm) -->
+                    <div>
+                        <label for="height" class="block text-sm font-medium text-gray-700 mb-1">Height (cm)<span class="text-red-500">*</span></label>
+                        <input type="number" id="height" name="height"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               value="{{ old('height') }}">
+                        @error('height')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                     <!-- ID Type -->
                     <div>
                         <label for="id_type" class="block text-sm font-medium text-gray-700 mb-1">ID Type <span class="text-red-500">*</span></label>
@@ -95,7 +126,7 @@
                     <!-- ID Number -->
                     <div>
                         <label for="id_number" class="block text-sm font-medium text-gray-700 mb-1">ID Number <span class="text-red-500">*</span></label>
-                        <input type="text" id="id_number" name="id_number"
+                        <input type="number" id="id_number" name="id_number"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                value="{{ old('id_number') }}">
                         @error('id_number')
@@ -205,7 +236,7 @@
                     </div>
                     <!-- Membership Term (Gym Access) -->
                     <div>
-                        <label for="membership_term" class="block text-sm font-medium text-gray-700 mb-1">Membership Term <span class="text-red-500">*</span></label>
+                        <label for="membership_term" class="block text-sm font-medium text-gray-700 mb-1">Membership Term (in months)<span class="text-red-500">*</span></label>
                         <input type="text" id="membership_term" name="membership_term" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                value="{{ old('membership_term') }}" placeholder="Enter membership term">
@@ -228,17 +259,6 @@
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                value="{{ old('emergency_contact_name') }}">
                         @error('emergency_contact_name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    
-                    <!-- Emergency Contact Relationship -->
-                    <div>
-                        <label for="emergency_contact_relationship" class="block text-sm font-medium text-gray-700 mb-1">Relationship <span class="text-red-500">*</span></label>
-                        <input type="text" id="emergency_contact_relationship" name="emergency_contact_relationship" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('emergency_contact_relationship') }}" placeholder="e.g., Spouse, Parent, Sibling">
-                        @error('emergency_contact_relationship')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -274,7 +294,7 @@
             </div>
             <!-- Form Actions -->
             <div class="flex justify-end space-x-4 pt-6">
-                <a href="{{ route('members.index') }}" 
+                <a href="{{ route('manage-members.index') }}" 
                    class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Cancel
                 </a>

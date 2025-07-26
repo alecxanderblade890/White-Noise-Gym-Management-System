@@ -16,7 +16,7 @@ class Member extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'full_name',
         'photo_url',
         'payment_date_membership',
         'membership_term_gym_access',
@@ -30,7 +30,7 @@ class Member extends Model
         'id_number',
         'email',
         'phone_number',
-        'contact_person',
+        'emergency_contact_person',
         'emergency_contact_number',
         'weight_kg',
         'height_cm',

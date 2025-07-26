@@ -1,91 +1,37 @@
 <x-layout>
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Members Management</h1>
+        
+        <div class="flex flex-col md:flex-row gap-20 py-8 items-center justify-center">
+            <!-- Add New Member Card -->
+            <a href="{{ route('register-member') }}" class="block group">
+                <div class="bg-white rounded-lg shadow-md p-4 h-full border-2 border-transparent hover:border-blue-500 transition-all duration-300 transform hover:scale-105 max-w-xs w-full">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Add New Member</h3>
+                        <p class="text-gray-600">Register a new gym member and add their details to the system.</p>
+                    </div>
+                </div>
+            </a>
 
-<div class="bg-white shadow-md rounded-lg p-6 mb-8">
-    <!-- Back button -->
-    <a href="{{ route('members.index') }}" class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Back
-        </a>
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Gym Members</h1>
-
-    @if($members->isEmpty())
-    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-        <p class="font-bold">No Members Found</p>
-        <p>It looks like there are no members registered yet.</p>
-    </div>
-    @else
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
-            <table class="min-w-full leading-normal table-container">
-                <thead>
-                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                        <th class="py-3 px-6 text-left w-16">Photo</th>             
-                        <th class="py-3 px-6 text-left w-48">Name</th>             
-                        <th class="py-3 px-6 text-left w-64">Email</th>
-                        <th class="py-3 px-6 text-left w-32">Phone</th>
-                        <th class="py-3 px-6 text-left w-40">Payment Date(Membership)</th>
-                        <th class="py-3 px-6 text-left w-48">Membership Term(Gym Access)</th>
-                        <th class="py-3 px-6 text-left w-32">Start Date</th>
-                        <th class="py-3 px-6 text-left w-32">End Date</th>
-                        <th class="py-3 px-6 text-left w-24">Billing Rate</th>
-                        <th class="py-3 px-6 text-left w-40">Payment Date(Gym Access)</th>
-                        <th class="py-3 px-6 text-left w-80">Address</th>          
-                        <th class="py-3 px-6 text-left w-32">Date of Birth</th>
-                        <th class="py-3 px-6 text-left w-32">ID Presented</th>
-                        <th class="py-3 px-6 text-left w-32">ID Number</th>
-                        <th class="py-3 px-6 text-left w-48">Contact Person</th>
-                        <th class="py-3 px-6 text-left w-48">Emergency Contact No.</th>
-                        <th class="py-3 px-6 text-left w-24">Weight (kg)</th>
-                        <th class="py-3 px-6 text-left w-24">Height (cm)</th>
-                        <th class="py-3 px-6 text-left w-64">Notes</th>            
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($members as $member)
-                        <tr class="border-b border-gray-200 hover:bg-gray-100" onclick="window.location='{{ route('member-details.show', $member->id) }}'" style="transition: background-color 0.2s;">
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                @if($member->photo_url)
-                                    <img src="{{ $member->photo_url }}" class="w-10 h-10 rounded-full object-cover">
-                                @else
-                                    <img src="{{ asset('images/default_avatar.png') }}" class="w-10 h-10 rounded-full object-cover">
-                                @endif
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->name }}</td> 
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->email }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->phone_number }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($member->payment_date_membership)->format('M d, Y') }}
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ $member->membership_term_gym_access }} months
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($member->start_date)->format('M d, Y') }}
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($member->end_date)->format('M d, Y') }}
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">₱{{ number_format($member->billing_rate, 2) }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($member->payment_date_gym_access)->format('M d, Y') }}
-                            </td>
-                            <td class="py-3 px-6 text-left">{{ $member->address }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ \Carbon\Carbon::parse($member->date_of_birth)->format('M d, Y') }} ({{ \Carbon\Carbon::parse($member->date_of_birth)->age }} yrs)</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->id_presented }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->id_number }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->contact_person }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->emergency_contact_number }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->weight_kg }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->height_cm }}</td>
-                            <td class="py-3 px-6 text-left text-sm">{{ $member->notes }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            </div>
+            <!-- View Members Card -->
+            <a href="{{ route('members.index') }}" class="block group">
+                <div class="bg-white rounded-lg shadow-md p-4 h-full border-2 border-transparent hover:border-green-500 transition-all duration-300 transform hover:scale-105 max-w-xs w-full">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 transition-colors duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">View All Members</h3>
+                        <p class="text-gray-600">Browse, search, and manage all registered gym members.</p>
+                    </div>
+                </div>
+            </a>
         </div>
-    @endif
-</div>
+    </div>
 </x-layout>
