@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+    <div class="container mx-auto px-4 py-8">
         <!-- Back button -->
         <a href="{{ route('manage-members.index') }}" class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -23,7 +23,7 @@
         <form action="{{route('add-member')}}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             <!-- Photo Upload -->
-            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Profile Photo</h2>
                 
                 <div class="flex items-center space-x-6">
@@ -46,7 +46,7 @@
                 @enderror
             </div>
             <!-- Personal Information Section -->
-            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Personal Information</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -74,52 +74,56 @@
                     
                     <!-- Phone -->
                     <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number <span class="text-red-500">*</span></label>
-                        <input type="tel" id="phone" name="phone" required
+                        <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number <span class="text-red-500">*</span></label>
+                        <input type="tel" id="phone_number" name="phone_number" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('phone') }}">
-                        @error('phone')
+                               value="{{ old('phone_number')}}">
+                        @error('phone_number')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     
                     <!-- Date of Birth -->
                     <div>
+                        <?php
+                            $minAge = 13;
+                            $maxDate = \Carbon\Carbon::now()->subYears($minAge)->format('Y-m-d');
+                        ?>
                         <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth <span class="text-red-500">*</span></label>
                         <input type="date" id="date_of_birth" name="date_of_birth" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('date_of_birth') }}">
+                               value="{{ old('date_of_birth') }}"">
                         @error('date_of_birth')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <!-- Weight (Kg) -->
                     <div>
-                        <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">Weight (kg) <span class="text-red-500">*</span></label>
-                        <input type="number" id="weight" name="weight"
+                        <label for="weight_kg" class="block text-sm font-medium text-gray-700 mb-1">Weight (kg) <span class="text-red-500">*</span></label>
+                        <input type="number" id="weight_kg" name="weight_kg"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('weight') }}">
-                        @error('weight')
+                               value="{{ old('weight_kg') }}">
+                        @error('weight_kg')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <!-- Height (cm) -->
                     <div>
-                        <label for="height" class="block text-sm font-medium text-gray-700 mb-1">Height (cm)<span class="text-red-500">*</span></label>
-                        <input type="number" id="height" name="height"
+                        <label for="height_cm" class="block text-sm font-medium text-gray-700 mb-1">Height (cm)<span class="text-red-500">*</span></label>
+                        <input type="number" id="height_cm" name="height_cm"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('height') }}">
-                        @error('height')
+                               value="{{ old('height_cm') }}">
+                        @error('height_cm')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <!-- ID Type -->
                     <div>
-                        <label for="id_type" class="block text-sm font-medium text-gray-700 mb-1">ID Type <span class="text-red-500">*</span></label>
-                        <input type="text" id="id_type" name="id_type" required
+                        <label for="id_presented" class="block text-sm font-medium text-gray-700 mb-1">ID Type <span class="text-red-500">*</span></label>
+                        <input type="text" id="id_presented" name="id_presented" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('id_type') }}">
-                        @error('id_type')
+                               value="{{ old('id_presented')}}">
+                        @error('id_presented')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -161,7 +165,7 @@
             </div>
             
             <!-- Address Section -->
-            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Address Information</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,7 +183,7 @@
             </div>
             
             <!-- Membership Section -->
-            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Membership Details</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -219,7 +223,7 @@
                         <label for="payment_date_membership" class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Membership) <span class="text-red-500">*</span></label>
                         <input type="date" id="payment_date_membership" name="payment_date_membership" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('payment_date_membership') }}" placeholder="Enter payment date">
+                               value="{{ old('payment_date_membership', now()->format('Y-m-d')) }}" placeholder="Enter payment date">
                         @error('payment_date_membership')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -229,18 +233,18 @@
                         <label for="payment_date_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Gym Access) <span class="text-red-500">*</span></label>
                         <input type="date" id="payment_date_gym_access" name="payment_date_gym_access" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('payment_date_gym_access') }}" placeholder="Enter payment date">
+                               value="{{ old('payment_date_gym_access', now()->format('Y-m-d')) }}" placeholder="Enter payment date">
                         @error('payment_date_gym_access')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <!-- Membership Term (Gym Access) -->
                     <div>
-                        <label for="membership_term" class="block text-sm font-medium text-gray-700 mb-1">Membership Term (in months)<span class="text-red-500">*</span></label>
-                        <input type="text" id="membership_term" name="membership_term" required
+                        <label for="membership_term_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Membership Term (in months)<span class="text-red-500">*</span></label>
+                        <input type="text" id="membership_term_gym_access" name="membership_term_gym_access" required readonly
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('membership_term') }}" placeholder="Enter membership term">
-                        @error('membership_term')
+                               value="{{ old('membership_term_gym_access') }}" placeholder="Enter membership term">
+                        @error('membership_term_gym_access')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -248,35 +252,35 @@
             </div>
             
             <!-- Emergency Contact Section -->
-            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Emergency Contact</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Emergency Contact Name -->
                     <div>
-                        <label for="emergency_contact_name" class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="emergency_contact_name" name="emergency_contact_name" required
+                        <label for="emergency_contact_person" class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="emergency_contact_person" name="emergency_contact_person" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('emergency_contact_name') }}">
-                        @error('emergency_contact_name')
+                               value="{{ old('emergency_contact_person') }}">
+                        @error('emergency_contact_person')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     
                     <!-- Emergency Contact Phone -->
                     <div>
-                        <label for="emergency_contact_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number <span class="text-red-500">*</span></label>
-                        <input type="tel" id="emergency_contact_phone" name="emergency_contact_phone" required
+                        <label for="emergency_contact_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number <span class="text-red-500">*</span></label>
+                        <input type="tel" id="emergency_contact_number" name="emergency_contact_number" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('emergency_contact_phone') }}">
-                        @error('emergency_contact_phone')
+                               value="{{ old('emergency_contact_number') }}">
+                        @error('emergency_contact_number')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
             </div>
             <!-- Notes -->
-            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Notes</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
@@ -305,27 +309,4 @@
             </div>
         </form>
     </div>
-    
-    @push('scripts')
-    <script>
-        // Initialize date pickers with appropriate max dates
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            
-            // // Set max date for date of birth (must be at least 13 years old)
-            // const dobInput = document.getElementById('date_of_birth');
-            // if (dobInput) {
-            //     const maxDob = new Date();
-            //     maxDob.setFullYear(maxDob.getFullYear() - 13);
-            //     dobInput.max = maxDob.toISOString().split('T')[0];
-            // }
-            
-            // Set min date for start date (today)
-            const startDateInput = document.getElementById('start_date');
-            if (startDateInput) {
-                startDateInput.min = today;
-            }
-        });
-    </script>
-    @endpush
 </x-layout>

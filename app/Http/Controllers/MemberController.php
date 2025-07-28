@@ -22,7 +22,7 @@ class MemberController extends Controller
             ],
         ]);
     }
-    public function index()
+    public function showManageMembers()
     {
         return view('pages.manage-members');
     }
@@ -91,11 +91,11 @@ class MemberController extends Controller
                 'photo_url' => $result['secure_url'],
                 'full_name' => $validated['full_name'],
                 'email' => $validated['email'],
-                'phone_number' => $validated['phone'],
+                'phone_number' => $validated['phone_number'],
                 'date_of_birth' => $validated['date_of_birth'],
-                'weight_kg' => $validated['weight'],
-                'height_cm' => $validated['height'],
-                'id_presented' => $validated['id_type'],
+                'weight_kg' => $validated['weight_kg'],
+                'height_cm' => $validated['height_cm'],
+                'id_presented' => $validated['id_presented'],
                 'id_number' => $validated['id_number'],
                 'address' => $validated['address'],
                 'start_date' => $validated['start_date'],
@@ -103,9 +103,9 @@ class MemberController extends Controller
                 'billing_rate' => $validated['billing_rate'],
                 'payment_date_membership' => $validated['payment_date_membership'],
                 'payment_date_gym_access' => $validated['payment_date_gym_access'],
-                'membership_term_gym_access' => $validated['membership_term'],
-                'emergency_contact_person' => $validated['emergency_contact_name'],
-                'emergency_contact_number' => $validated['emergency_contact_phone'],
+                'membership_term_gym_access' => $validated['membership_term_gym_access'],
+                'emergency_contact_person' => $validated['emergency_contact_person'],
+                'emergency_contact_number' => $validated['emergency_contact_number'],
                 'notes' => $validated['notes'] ?? null,
             ]);
         } catch (ValidationException $e) {

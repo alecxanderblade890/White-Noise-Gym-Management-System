@@ -16,14 +16,15 @@ return new class extends Migration
             $table->string('date');
             $table->time('time_in');
             $table->time('time_out');
-            $table->unsignedBigInteger('member_id'); // Assuming member_id is a foreign key
+            $table->foreignId('member_id')->constrained();
             $table->string('full_name');
-            $table->unsignedInteger('membership_term_gym_access'); // Assuming this is a number
+            $table->integer('membership_term_gym_access');
             $table->string('payment_method');
+            $table->unsignedInteger('payment_amount');
             $table->string('purpose_of_visit');
-            $table->string('staff_assigned'); // Assuming staff assigned is a string
-            $table->boolean('upgrade_gym_access'); // Assuming upgrade is a boolean
-            $table->text('notes'); // Assuming notes is a text field
+            $table->string('staff_assigned');
+            $table->boolean('upgrade_gym_access'); 
+            $table->text('notes'); 
             $table->timestamps();
         });
     }
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('daily_log');
+        Schema::dropIfExists('daily_logs');
     }
 };

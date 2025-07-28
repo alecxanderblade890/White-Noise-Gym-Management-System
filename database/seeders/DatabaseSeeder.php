@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //Member::factory(3)->create();
+        Member::factory(10)->create();
         DailyLog::factory(10)->create();
     }
 }

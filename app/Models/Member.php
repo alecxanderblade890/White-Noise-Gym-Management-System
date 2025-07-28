@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 
 class Member extends Model
@@ -36,4 +37,9 @@ class Member extends Model
         'height_cm',
         'notes',
     ];
+
+    public function dailyLogs(): HasMany
+    {
+        return $this->hasMany(DailyLog::class);
+    }
 }
