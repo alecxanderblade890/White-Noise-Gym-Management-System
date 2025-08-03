@@ -1,21 +1,11 @@
 <x-layout>
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
-        <div class="bg-white mx-auto shadow-md rounded-lg p-6 mb-8">
-            <details>
-                <summary class="text-xl font-semibold text-gray-700 mb-4 cursor-pointer">Total Sales Today: </summary>
-                @if ($errors->any())
-                    <div class="mb-4">
-                        <div class="text-red-600 font-semibold">Please fix the following errors:</div>
-                        <ul class="list-disc list-inside text-red-500">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                
-            </details>
+    <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Dashboard</h1>
+        
+
+        <!-- Empty state for mobile -->
+        <!-- <div class="p-4 text-sm text-gray-500 text-center sm:hidden">
+            <p>Tip: Swipe left to see all columns</p>
         </div>
     </div>
 </x-layout>

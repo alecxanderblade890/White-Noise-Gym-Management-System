@@ -2,11 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DailyLogController;
 
-Route::get('/', function () {
-    return view('pages.dashboard');
-})->name('dashboard');
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::get('/members', [MemberController::class, 'getMembers'])->name('members.index');
 Route::get('/manage-members', [MemberController::class, 'showManageMembers'])->name('manage-members.index');

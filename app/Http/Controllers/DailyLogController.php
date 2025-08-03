@@ -22,7 +22,7 @@ class DailyLogController extends Controller
             'purpose_of_visit' => 'required|string|max:255',
             'staff_assigned' => 'required|string|max:255',
             'upgrade_gym_access' => 'required|in:yes,no',
-            'notes' => 'required|string',
+            'notes' => 'string|nullable'
         ]);
 
         try {
@@ -37,7 +37,6 @@ class DailyLogController extends Controller
                 'time_out' => $validated['time_out'],
                 'member_id' => $validated['member_id'],
                 'full_name' => $member->full_name,
-                'membership_term_gym_access' => $member->membership_term_gym_access,
                 'payment_method' => $validated['payment_method'],
                 'payment_amount' => $validated['payment_amount'],
                 'purpose_of_visit' => $validated['purpose_of_visit'],
@@ -56,7 +55,7 @@ class DailyLogController extends Controller
     }
     public function getDailyLogs()
     {
-        $dailyLogs = DailyLog::all();
+        $dailyLogs = DailyLog::with('member')->get();
         return view('pages.daily-logs', compact('dailyLogs'));
     }
 

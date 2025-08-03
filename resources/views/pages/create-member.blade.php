@@ -38,7 +38,7 @@
                         file:text-sm file:font-semibold
                         file:bg-blue-50 file:text-blue-700
                         hover:file:bg-blue-100"
-                        onchange="document.getElementById('photo-preview').src = window.URL.createObjectURL(this.files[0])">
+                        onchange="document.getElementById('photo-preview').src = window.URL.createObjectURL(this.files[0])" require>
                     </label>
                 </div>
                 @error('photo')
@@ -187,64 +187,98 @@
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Membership Details</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    <!-- Start Date -->
+
+                    <!-- Member Type -->
                     <div>
-                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date <span class="text-red-500">*</span></label>
-                        <input type="date" id="start_date" name="start_date" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('start_date', now()->format('Y-m-d')) }}">
-                        @error('start_date')
+                        <label for="member_type" class="block text-sm font-medium text-gray-700 mb-1">Member Type <span class="text-red-500">*</span></label>
+                        <select id="member_type" name="member_type" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="student" {{ old('member_type') == 'student' ? 'selected' : '' }}>Student</option>
+                            <option value="regular" {{ old('member_type') == 'regular' ? 'selected' : '' }}>Regular</option>
+                        </select>
+                        @error('member_type')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
-                    <!-- End Date -->
-                    <div>
-                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date <span class="text-red-500">*</span></label>
-                        <input type="date" id="end_date" name="end_date" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('end_date', now()->format('Y-m-d')) }}">
-                        @error('end_date')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                     <!-- Membership Term (Gym Access) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="membership_term_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Membership Term (Gym Access) <span class="text-red-500">*</span></label>
+                            <select id="membership_term_gym_access" name="membership_term_gym_access" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="None" {{ old('membership_term_gym_access') == 'None' ? 'selected' : '' }}>None</option>
+                                <option value="1_month" {{ old('membership_term_gym_access') == '1_month' ? 'selected' : '' }}>1 Month</option>
+                                <option value="3_months" {{ old('membership_term_gym_access') == '3_months' ? 'selected' : '' }}>3 Months</option>
+                                <option value="walk_in" {{ old('membership_term_gym_access') == 'walk_in' ? 'selected' : '' }}>Walk In</option>
+                            </select>
+                            @error('membership_term_gym_access')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <!-- Membership Term Billing Rate -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Membership Term Billing Rate</label>
+                            <div class="mt-1 flex items-center">
+                                <input type="hidden" id="membership_term_billing_rate_hidden" name="membership_term_billing_rate" value="0">
+                                <input type="text" id="membership_term_billing_rate" readonly
+                                    class="flex-1 pl-4 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-700 focus:outline-none"
+                                    value="₱0">
+                                <span id="billing-rate-suffix" class="flex-1 px-4 py-2 border border-gray-300 rounded-r-md bg-gray-50 text-gray-700 focus:outline-none">
+                                    /month
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Billing Rate -->
-                    <div>
-                        <label for="billing_rate" class="block text-sm font-medium text-gray-700 mb-1">Billing Rate <span class="text-red-500">*</span></label>
-                        <input type="number" id="billing_rate" name="billing_rate" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('billing_rate') }}" placeholder="Enter billing rate in Php">
-                        @error('billing_rate')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <!-- With PT -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="with_pt" class="block text-sm font-medium text-gray-700 mb-1">With Personal Trainer <span class="text-red-500">*</span></label>
+                            <select id="with_pt" name="with_pt" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="none" {{ old('with_pt') == 'none' ? 'selected' : '' }}>None</option>
+                                <option value="1_month" {{ old('with_pt') == '1_month' ? 'selected' : '' }}>1 Month</option>
+                            </select>
+                            @error('with_pt')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <!-- With PT Billing Rate -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">With Personal Trainer Billing Rate</label>
+                            <input type="hidden" id="with_pt_billing_rate_hidden" name="with_pt_billing_rate" value="0">
+                            <input type="text" id="with_pt_billing_rate" readonly
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                                value="0">
+                        </div>
                     </div>
-                    <!-- Payment Date (Membership) -->
+                    <!-- Membership Period -->
                     <div>
-                        <label for="payment_date_membership" class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Membership) <span class="text-red-500">*</span></label>
-                        <input type="date" id="payment_date_membership" name="payment_date_membership" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('payment_date_membership', now()->format('Y-m-d')) }}" placeholder="Enter payment date">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Membership Period <span class="text-red-500">*</span></label>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" readonly
+                                   class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                                   value="{{ now()->format('F d, Y') }}">
+                            <span class="text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                            <input type="text" readonly
+                                   class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                                   value="{{ now()->addYear()->format('F d, Y') }}">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">1 Year Membership Period</p>
                         @error('payment_date_membership')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <!-- Payment Date (Gym Access) -->
                     <div>
-                        <label for="payment_date_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Gym Access) <span class="text-red-500">*</span></label>
-                        <input type="date" id="payment_date_gym_access" name="payment_date_gym_access" required
+                        <label for="gym_access_start_date" class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Gym Access)</label>
+                        <input type="date" id="gym_access_start_date" name="gym_access_start_date"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('payment_date_gym_access', now()->format('Y-m-d')) }}" placeholder="Enter payment date">
-                        @error('payment_date_gym_access')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <!-- Membership Term (Gym Access) -->
-                    <div>
-                        <label for="membership_term_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Membership Term (in months)<span class="text-red-500">*</span></label>
-                        <input type="text" id="membership_term_gym_access" name="membership_term_gym_access" required readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('membership_term_gym_access') }}" placeholder="Enter membership term">
-                        @error('membership_term_gym_access')
+                               value="" placeholder="Enter payment date">
+                        @error('gym_access_start_date')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

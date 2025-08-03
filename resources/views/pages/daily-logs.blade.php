@@ -41,7 +41,7 @@
                             <label for="time_in" class="block text-sm font-medium text-gray-700 mb-1">Time in<span class="text-red-500">*</span></label>
                             <input type="time" id="time_in" name="time_in" required
                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   value="{{ date('H:i', time() + (8 * 60 * 60)) }}">
+                                   value="{{ date('H:i', time());}}">
                             @error('time_in')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -51,7 +51,7 @@
                             <label for="time_out" class="block text-sm font-medium text-gray-700 mb-1">Time out<span class="text-red-500">*</span></label>
                             <input type="time" id="time_out" name="time_out" required
                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   value="{{ old('time_out', '17:00') }}">
+                                   value="{{ old('time_out') }}">
                             @error('time_out')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -61,7 +61,7 @@
                             <label for="member_id" class="block text-sm font-medium text-gray-700 mb-1">Member ID<span class="text-red-500">*</span></label>
                             <input type="number" id="member_id" name="member_id" required
                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   value="{{ old('member_id', '12345') }}">
+                                   value="{{ old('member_id') }}">
                             @error('member_id')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -100,24 +100,24 @@
                             <label for="staff_assigned" class="block text-sm font-medium text-gray-700 mb-1">Staff Assigned<span class="text-red-500">*</span></label>
                             <input type="text" id="staff_assigned" name="staff_assigned" required
                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   value="{{ old('staff_assigned', 'Jane Smith') }}">
+                                   value="{{ old('staff_assigned') }}">
                             @error('staff_assigned')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="upgrade_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Upgrade Gym Access<span class="text-red-500">*</span></label>
+                            <label for="upgrade_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Modify Gym Access<span class="text-red-500">*</span></label>
                             <select id="upgrade_gym_access" name="upgrade_gym_access" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="no" {{ old('upgrade_gym_access') == 'no' ? 'selected' : '' }}>No</option>    
                                 <option value="yes">Yes</option>
-                                <option value="no" {{ old('upgrade_gym_access') == 'no' ? 'selected' : '' }}>No</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes<span class="text-red-500">*</span></label>
-                        <textarea id="notes" name="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">Example notes here</textarea>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea id="notes" name="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
                     </div>
 
                     <div>
@@ -162,9 +162,9 @@
                                 date: '{{ \Carbon\Carbon::parse($dailyLog->date)->format('M d, Y') }}',
                                 time_in: '{{ \Carbon\Carbon::parse($dailyLog->time_in)->format('h:i A') }}',
                                 time_out: '{{ \Carbon\Carbon::parse($dailyLog->time_out)->format('h:i A') }}',
-                                member_id: '{{ $dailyLog->member_id }}',
+                                member_id: '{{ $dailyLog->member_id ?? 'Not a Member Anymore' }}',
                                 full_name: '{{ $dailyLog->full_name ?? '' }}',
-                                membership_term_gym_access: '{{ $dailyLog->membership_term_gym_access ?? '' }}',
+                                membership_term_gym_access: '{{ $dailyLog->member->membership_term_gym_access ?? '0' }}',
                                 payment_method: '{{ $dailyLog->payment_method ?? '' }}',
                                 payment_amount: '{{ $dailyLog->payment_amount ?? '' }}',
                                 purpose_of_visit: '{{ $dailyLog->purpose_of_visit }}',
@@ -189,7 +189,7 @@
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 <p class="text-gray-900 whitespace-no-wrap">
-                                    {{ $dailyLog->member_id }}
+                                    {{ $dailyLog->member_id ?? 'Not a Member Anymore' }}
                                 </p>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">

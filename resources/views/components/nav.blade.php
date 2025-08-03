@@ -1,7 +1,11 @@
-<nav class="bg-gray-800 text-white">
+<nav class="bg-black text-white">
     <!-- Mobile menu button -->
     <div class="flex items-center justify-between p-4 md:hidden">
-        <div class="text-xl font-bold">White Noise Gym</div>
+        <div class="text-xl font-bold flex justify-center w-full">
+            <a href="{{route('dashboard')}}">
+                <img src="{{asset('images/white_noise_gym_logo_2.png')}}" alt="" class="w-20">
+            </a>
+        </div>
         <button class="text-white focus:outline-none">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
@@ -11,9 +15,13 @@
 
     <!-- Sidebar -->
     <div class="md:flex md:flex-shrink-0">
-        <div :class="{'block': open, 'hidden': !open}" class="w-full md:block md:w-64 bg-gray-800 min-h-screen transition-all duration-300 ease-in-out">
+        <div :class="{'block': open, 'hidden': !open}" class="w-full md:block md:w-64 bg-black min-h-screen transition-all duration-300 ease-in-out">
             <div class="p-4">
-                <div class="hidden md:block text-xl font-bold mb-6">White Noise Gym</div>
+                <div class="hidden md:flex justify-center text-xl font-bold mb-6">
+                    <a href="{{route('dashboard')}}">
+                        <img src="{{asset('images/white_noise_gym_logo_2.png')}}" alt="" class="w-30">
+                    </a>
+                </div>
                 
                 <!-- Navigation Links -->
                 <div class="space-y-2">

@@ -1,5 +1,98 @@
 import './bootstrap';
 
+// Function to update base rate based on membership term and member type
+function updateMembershipTermBillingRate() {
+    const memberType = document.getElementById('member_type');
+    const membershipTerm = document.getElementById('membership_term_gym_access');
+    const baseRateField = document.getElementById('membership_term_billing_rate');
+    const hiddenRateField = document.getElementById('membership_term_billing_rate_hidden');
+    const billingRateSuffix = document.getElementById('billing-rate-suffix');
+    
+    if (!memberType || !membershipTerm || !baseRateField || !hiddenRateField || !billingRateSuffix) return;
+    
+    let rate = 0;
+    
+    // Base rates
+    if (membershipTerm.value === 'none') {
+        rate = 0;
+    }
+    else if (membershipTerm.value === '1_month') {
+        rate = (memberType.value === 'student') ? 1000 : 1500;
+    } else if (membershipTerm.value === '3_months') {
+        rate = (memberType.value === 'student') ? 2500 : 4500;
+    } else if (membershipTerm.value === 'walk_in') {
+        rate = (memberType.value === 'student') ? 100 : 150;
+    }
+    
+    // Update the hidden field with raw numeric value
+    hiddenRateField.value = rate;
+    
+    // Update the visible field with formatted value
+    baseRateField.value = '₱' + rate.toLocaleString();
+    
+    // Update the billing rate suffix
+    billingRateSuffix.textContent = membershipTerm.value === 'walk_in' ? '/day' : '/month';
+}
+
+// Function to update PT billing rate based on selection
+function updatePtBillingRate() {
+    const withPt = document.getElementById('with_pt');
+    const ptBillingRateField = document.getElementById('with_pt_billing_rate');
+    const hiddenPtBillingRateField = document.getElementById('with_pt_billing_rate_hidden');
+    
+    if (!withPt || !ptBillingRateField) return;
+    
+    let rate = 0;
+    
+    if (withPt.value === 'none') {
+        rate = 0;
+    }
+    else if (withPt.value === '1_month') {
+        rate = 3000;
+    }
+    // else rate remains 0
+    
+    // Update the PT billing rate field
+    ptBillingRateField.value = '₱' + rate.toLocaleString();
+    
+    // Update the hidden field with raw numeric value
+    hiddenPtBillingRateField.value = rate;
+}
+
+// Add event listeners for base rate calculation
+document.addEventListener('DOMContentLoaded', function() {
+    const memberType = document.getElementById('member_type');
+    const membershipTerm = document.getElementById('membership_term_gym_access');
+    const billingRateSuffix = document.getElementById('billing-rate-suffix');
+    
+    // Update billing rate suffix when membership term changes
+    if (membershipTerm && billingRateSuffix) {
+        membershipTerm.addEventListener('change', function() {
+            billingRateSuffix.textContent = this.value === 'walk_in' ? '/day' : '/month';
+        });
+        
+        // Initialize on page load
+        billingRateSuffix.textContent = membershipTerm.value === 'walk_in' ? '/day' : '/month';
+    }
+    const withPt = document.getElementById('with_pt');
+    
+    // Base rate event listeners
+    if (memberType && membershipTerm) {
+        memberType.addEventListener('change', updateMembershipTermBillingRate);
+        membershipTerm.addEventListener('change', updateMembershipTermBillingRate);
+        
+        // Calculate initial base rate
+        updateMembershipTermBillingRate();
+    }
+    
+    // PT billing rate event listener
+    if (withPt) {
+        withPt.addEventListener('change', updatePtBillingRate);
+        // Set initial PT billing rate
+        updatePtBillingRate();
+    }
+});
+
 function openModal() {
     document.getElementById('editProfileModal').classList.remove('hidden');
 }
@@ -89,56 +182,22 @@ window.closeDeleteModal = closeDeleteModal;
 window.showLogDetailsModal = showLogDetailsModal;
 window.closeLogDetailsModal = closeLogDetailsModal;
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM Content Loaded event fired!")
-    const startDateInput = document.getElementById('start_date');
-    const endDateInput = document.getElementById('end_date');
-    const membershipTermInput = document.getElementById('membership_term_gym_access');
-    function calculateMembershipTerm() {
-        const startDateValue = startDateInput.value;
-        const endDateValue = endDateInput.value;
-        if (startDateValue && endDateValue) {
-            const startDate = new Date(startDateValue);
-            const endDate = new Date(endDateValue);
-            // Calculate the difference in months
-            // This approach accounts for year differences
-            let months;
-            months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
-            months -= startDate.getMonth();
-            months += endDate.getMonth();
-            // Adjust for day differences if necessary.
-            // If end day is before start day in the same month, subtract 1.
-            if (endDate.getDate() < startDate.getDate()) {
-                months--;
-            }
-            
-            // Ensure the minimum term is 0 (or 1 if you prefer a minimum of 1 month)
-            // If the end date is before the start date, the term should be 0 or negative
-            if (months < 0) {
-                months = 0; // Or handle as an error/invalid date range
-            } else if (months === 0 && endDate.getDate() >= startDate.getDate()) {
-                months = 1; // If dates are in the same month and end date is not before start date, consider it 1 month
-            }
-            membershipTermInput.value = months;
-        } else {
-            membershipTermInput.value = ''; // Clear if dates are not fully selected
-        }
-    }
-    // Add event listeners
-    startDateInput.addEventListener('change', calculateMembershipTerm);
-    endDateInput.addEventListener('change', calculateMembershipTerm);
-    // Call it once on load to handle pre-filled values (e.g., old() or now()->format())
-    calculateMembershipTerm();
-});
+// Only add event listeners if the elements exist
+const editProfileBtn = document.querySelector('[data-edit-profile]');
+const deleteMemberBtn = document.querySelector('[data-delete-member]');
 
-document.querySelector('[data-edit-profile]').addEventListener('click', function(e) {
-    e.preventDefault();
-    openModal();
-});
+if (editProfileBtn) {
+    editProfileBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        openModal();
+    });
+}
 
-document.querySelector('[data-delete-member]').addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default action
-    openDeleteModal(); // Show the modal
-});
+if (deleteMemberBtn) {
+    deleteMemberBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+        openDeleteModal();
+    });
+}
 
 

@@ -21,16 +21,19 @@
             <table class="min-w-full leading-normal table-container">
                 <thead>
                     <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left w-16">ID</th>
                         <th class="py-3 px-6 text-left w-16">Photo</th>             
                         <th class="py-3 px-6 text-left w-48">Name</th>             
                         <th class="py-3 px-6 text-left w-64">Email</th>
                         <th class="py-3 px-6 text-left w-32">Phone</th>
-                        <th class="py-3 px-6 text-left w-40">Payment Date(Membership)</th>
-                        <th class="py-3 px-6 text-left w-48">Membership Term(Gym Access)</th>
-                        <th class="py-3 px-6 text-left w-32">Start Date</th>
-                        <th class="py-3 px-6 text-left w-32">End Date</th>
-                        <th class="py-3 px-6 text-left w-24">Billing Rate</th>
-                        <th class="py-3 px-6 text-left w-40">Payment Date(Gym Access)</th>
+                        <th class="py-3 px-6 text-left w-32">Member Type</th>
+                        <th class="py-3 px-6 text-left w-40">Membership Start Date</th>
+                        <th class="py-3 px-6 text-left w-48">Membership End Date</th>
+                        <th class="py-3 px-6 text-left w-32">Gym Access Start Date</th>
+                        <th class="py-3 px-6 text-left w-32">Gym Access End Date</th>
+                        <th class="py-3 px-6 text-left w-32">With PT</th>
+                        <th class="py-3 px-6 text-left w-32">Membership Term Billing Rate</th>
+                        <th class="py-3 px-6 text-left w-32">With PT Billing Rate</th>
                         <th class="py-3 px-6 text-left w-80">Address</th>          
                         <th class="py-3 px-6 text-left w-32">Date of Birth</th>
                         <th class="py-3 px-6 text-left w-32">ID Presented</th>
@@ -45,6 +48,7 @@
                 <tbody>
                     @foreach($members as $member)
                         <tr class="border-b border-gray-200 hover:bg-gray-100" onclick="window.location='{{ route('member-details.show', $member->id) }}'" style="transition: background-color 0.2s;">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->id }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">
                                 @if($member->photo_url)
                                     <img src="{{ $member->photo_url }}" class="w-10 h-10 rounded-full object-cover">
@@ -55,23 +59,15 @@
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->full_name }}</td> 
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->email }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->phone_number }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($member->payment_date_membership)->format('M d, Y') }}
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ $member->membership_term_gym_access }} months
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($member->start_date)->format('M d, Y') }}
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($member->end_date)->format('M d, Y') }}
-                            </td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">₱{{ number_format($member->billing_rate, 2) }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">
-                                {{ \Carbon\Carbon::parse($member->payment_date_gym_access)->format('M d, Y') }}
-                            </td>
-                            <td class="py-3 px-6 text-left">{{ $member->address }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ \Carbon\Carbon::parse($member->membership_start_date)->format('M d, Y') }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ \Carbon\Carbon::parse($member->membership_end_date)->format('M d, Y') }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->gym_access_start_date ? \Carbon\Carbon::parse($member->gym_access_start_date)->format('M d, Y') : '' }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->gym_access_end_date ? \Carbon\Carbon::parse($member->gym_access_end_date)->format('M d, Y') : '' }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->with_pt }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->membership_term_billing_rate }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->with_pt_billing_rate }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->address }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ \Carbon\Carbon::parse($member->date_of_birth)->format('M d, Y') }} ({{ \Carbon\Carbon::parse($member->date_of_birth)->age }} yrs)</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->id_presented }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->id_number }}</td>

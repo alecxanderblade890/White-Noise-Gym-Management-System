@@ -17,13 +17,20 @@ class DailyLog extends Model
         'time_out',
         'member_id',
         'full_name',
-        'membership_term_gym_access',
         'payment_method',
         'payment_amount',
         'purpose_of_visit',
         'staff_assigned',
         'upgrade_gym_access',
         'notes',
+    ];
+
+    protected $casts = [
+        'member_id' => 'integer',
+    ];
+
+    protected $nullable = [
+        'member_id',
     ];
 
     public function member(): BelongsTo

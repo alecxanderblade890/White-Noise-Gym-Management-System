@@ -20,3 +20,26 @@ tr[onclick]:hover {
 tr[onclick]:active {
     background-color: #e5e7eb !important;
 }
+
+/* Custom scrollbar for table container */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #c7d2fe;
+    border-radius: 4px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #a5b4fc;
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 640px) {
+    td, th {
+        padding: 0.75rem 0.5rem;
+    }
+}

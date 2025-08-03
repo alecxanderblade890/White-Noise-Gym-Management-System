@@ -87,30 +87,48 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Membership)</label>
-                        <input type="date" name="payment_date_membership" value="{{ $member->payment_date_membership }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Member Type</label>
+                        <select id="member_type" name="member_type" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="student" {{ $member->member_type == 'Student' ? 'selected' : '' }}>Student</option>
+                            <option value="regular" {{ $member->member_type == 'Regular' ? 'selected' : '' }}>Regular</option>
+                        </select>                
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Gym Access)</label>
-                        <input type="date" name="payment_date_gym_access" value="{{ $member->payment_date_gym_access }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Membership Start Date</label>
+                        <input type="date" name="membership_start_date" value="{{ $member->membership_start_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Membership Term (months)</label>
-                        <input type="number" name="membership_term_gym_access" value="{{ $member->membership_term_gym_access }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Membership End Date</label>
+                        <input type="date" name="membership_end_date" value="{{ $member->membership_end_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" readonly>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                        <input type="date" name="start_date" value="{{ $member->start_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Gym Access Start Date</label>
+                        <input type="date" id="gym_access_start_date" name="gym_access_start_date" value="{{ $member->gym_access_start_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" onchange="calculateMembershipTerm()">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                        <input type="date" name="end_date" value="{{ $member->end_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Gym Access End Date</label>
+                        <input type="date" id="gym_access_end_date" name="gym_access_end_date" value="{{ $member->gym_access_end_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" onchange="calculateMembershipTerm()">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Billing Rate</label>
-                        <input type="number" name="billing_rate" value="{{ $member->billing_rate }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Membership Term (Gym Access)</label>
+                        <select id="membership_term_gym_access" name="membership_term_gym_access" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="none" {{ $member->membership_term_gym_access == 'none' ? 'selected' : '' }}>None</option>
+                            <option value="1_month" {{ $member->membership_term_gym_access == '1_month' ? 'selected' : '' }}>1 Month</option>
+                            <option value="3_months" {{ $member->membership_term_gym_access == '3_months' ? 'selected' : '' }}>3 Months</option>
+                            <option value="walk_in" {{ $member->membership_term_gym_access == 'walk_in' ? 'selected' : '' }}>Walk In</option>
+                        </select>                
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">With Personal Trainer</label>
+                        <select id="with_pt" name="with_pt" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="none" {{ $member->with_pt == 'None' ? 'selected' : '' }}>None</option>
+                            <option value="1 month" {{ $member->with_pt == '1 Month' ? 'selected' : '' }}>1 Month</option>
+                        </select>                
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
@@ -158,11 +176,30 @@
                     
                     <!-- Membership Status Badge -->
                     @php
-                        $isActive = \Carbon\Carbon::parse($member->end_date)->isFuture();
+                        $now = now();
+                        $membershipStartDate = \Carbon\Carbon::parse($member->membership_start_date);
+                        $membershipEndDate = \Carbon\Carbon::parse($member->membership_end_date);
+                        $gymAccessStartDate = \Carbon\Carbon::parse($member->gym_access_start_date);
+                        $gymAccessEndDate = \Carbon\Carbon::parse($member->gym_access_end_date);
+                        $ptStartDate = \Carbon\Carbon::parse($member->pt_start_date);
+                        $ptEndDate = \Carbon\Carbon::parse($member->pt_end_date);
+                        $isActiveMembership = $now->betweenIncluded($membershipStartDate, $membershipEndDate);
+                        $isActiveGymAccess = $now->betweenIncluded($gymAccessStartDate, $gymAccessEndDate);
+                        $isActivePT = $now->betweenIncluded($ptStartDate, $ptEndDate);
                     @endphp
-                    <span class="mt-2 px-4 py-1 rounded-full text-sm font-medium {{ $isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                        {{ $isActive ? 'Active' : 'Expired' }} Membership
+                    <span class="mt-2 px-4 py-1 rounded-full text-sm font-medium {{ $isActiveMembership ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                        {{ $isActiveMembership ? 'Active' : 'Expired' }} Membership
                     </span>
+                    @if($member->gym_access_start_date && $member->gym_access_end_date)
+                        <span class="mt-2 px-4 py-1 rounded-full text-sm font-medium {{ $isActiveGymAccess ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                            {{ $isActiveGymAccess ? 'Active' : 'Expired' }} Gym Access
+                        </span>
+                    @endif
+                    @if($member->pt_start_date && $member->pt_end_date)
+                        <span class="mt-2 px-4 py-1 rounded-full text-sm font-medium {{ $isActivePT ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                            {{ $isActivePT ? 'Active' : 'Expired' }} PT
+                        </span>
+                    @endif
                 </div>
 
                 <!-- Member Details -->
@@ -207,26 +244,67 @@
                             <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Membership Details</h2>
                             <div>
                                 <p class="text-sm text-gray-500">Membership Term</p>
-                                <p class="font-medium">{{ $member->membership_term_gym_access }} months</p>
+                                <p class="font-medium">{{ $member->membership_term_gym_access == 'None' ? 'None' : $member->membership_term_gym_access . 'month' }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Start Date</p>
-                                <p class="font-medium">{{ \Carbon\Carbon::parse($member->start_date)->format('F j, Y') }}</p>
+                                <p class="text-sm text-gray-500">Membership Start Date</p>
+                                <p class="font-medium">{{ \Carbon\Carbon::parse($member->membership_start_date)->format('F j, Y') }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">End Date</p>
-                                <p class="font-medium {{ $isActive ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ \Carbon\Carbon::parse($member->end_date)->format('F j, Y') }}
-                                    @if($isActive)
-                                        ({{ round(now()->diffInDays(\Carbon\Carbon::parse($member->end_date))) }} days remaining)
+                                <p class="text-sm text-gray-500">Membership End Date</p>
+                                <p class="font-medium {{ $isActiveMembership ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ \Carbon\Carbon::parse($member->membership_end_date)->format('F j, Y') }}
+                                    @if($isActiveMembership)
+                                        ({{ (int)(\Carbon\Carbon::parse($member->membership_end_date)->addDay()->diffInDays(now()) * -1 + 1) }} days remaining)
                                     @else
-                                        (Expired {{ round(now()->diffInDays(\Carbon\Carbon::parse($member->end_date)) * -1) }} days ago)
+                                        (Expired {{ round(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) *-1 }} days ago)
                                     @endif
                                 </p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Billing Rate</p>
-                                <p class="font-medium">₱{{ number_format($member->billing_rate, 2) }}</p>
+                                <p class="text-sm text-gray-500">Gym Access Start Date</p>
+                                <p class="font-medium">{{ $member->gym_access_start_date ? \Carbon\Carbon::parse($member->gym_access_start_date)->format('F j, Y') : 'No Term Active' }}</p>
+                            </div>
+                            <div>
+                                @if($member->gym_access_end_date)
+                                    <p class="text-sm text-gray-500">Gym Access End Date</p>
+                                    <p class="font-medium {{ $isActiveGymAccess ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ \Carbon\Carbon::parse($member->gym_access_end_date)->format('F j, Y') }}
+                                        @if($isActiveGymAccess)
+                                            ({{ (int)(\Carbon\Carbon::parse($member->gym_access_end_date)->addDay()->diffInDays(now()) * -1 + 1) }} days remaining)
+                                        @else
+                                            (Expired {{ round(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) *-1 }} days ago)
+                                        @endif
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Billing Rates</h2>
+                            <div>
+                                <p class="text-sm text-gray-500">Membership Rate:</p>
+                                <p class="font-medium"> ₱ 500/year</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Gym Access Rate:</p>
+                                @if($member->membership_term_gym_access == 'None')
+                                    <p class="font-medium">None</p>
+                                @elseif($member->membership_term_gym_access == 'Walk In')
+                                    <p class="font-medium">{{ $member->member_type == 'Student' ? '₱ 100/day' : '₱ 150/day' }}</p>
+                                @elseif($member->membership_term_gym_access == '1 Month')
+                                    <p class="font-medium">{{ $member->member_type == 'Student' ? '₱ 1,000/month' : '₱ 1,500/month' }}</p>
+                                @elseif($member->membership_term_gym_access == '3 Months')
+                                    <p class="font-medium">{{ $member->member_type == 'Student' ? '₱ 2,500/month' : '₱ 4,500/month' }}</p>
+                                @endif
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Personal Trainer Rate:</p>
+                                @if($member->with_pt == 'None')
+                                    <p class="font-medium">None</p>
+                                @elseif($member->with_pt == '1 Month')
+                                    <p class="font-medium"> ₱ 3,000/month</p>
+                                @endif
                             </div>
                         </div>
 

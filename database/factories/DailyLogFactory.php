@@ -24,7 +24,6 @@ class DailyLogFactory extends Factory
             'time_out' => fake()->time(),
             'member_id' => $member->id,
             'full_name' => $member->full_name,
-            'membership_term_gym_access' => $member->membership_term_gym_access,
             'payment_method' => fake()->randomElement(['Cash', 'GCash', 'Bank Transfer']),
             'payment_amount' => fake()->randomFloat(2, 100, 1000), // Random amount between 100 and 1000
             'purpose_of_visit' => fake()->sentence(),
