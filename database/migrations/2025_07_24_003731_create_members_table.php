@@ -22,8 +22,10 @@ return new class extends Migration
             $table->string('email');
             $table->string('phone_number');
             $table->enum('member_type', ['Student', 'Regular'])->default('Regular');
-            $table->enum('membership_term_gym_access', ['none', '1_month', '3_months', 'walk_in'])->default('none');
-            $table->enum('with_pt', ['none', '1_month'])->default('none');
+            $table->enum('membership_term_gym_access', ['None', '1 month', '3 months', 'Walk in'])->default('None');
+            $table->enum('with_pt', ['None', '1 month'])->default('None');
+            $table->date('pt_start_date')->nullable();
+            $table->date('pt_end_date')->nullable();
             $table->date('membership_start_date');
             $table->date('membership_end_date');
             $table->date('gym_access_start_date')->nullable();

@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('date');
             $table->time('time_in');
-            $table->time('time_out');
+            $table->time('time_out')->nullable();
             $table->foreignId('member_id')->nullable()->constrained()->onDelete('set null');
             $table->string('full_name');
             $table->string('payment_method');
             $table->unsignedInteger('payment_amount');
+            $table->json('items_bought')->nullable();
             $table->string('purpose_of_visit');
             $table->string('staff_assigned');
             $table->boolean('upgrade_gym_access'); 

@@ -7,20 +7,30 @@ function updateMembershipTermBillingRate() {
     const baseRateField = document.getElementById('membership_term_billing_rate');
     const hiddenRateField = document.getElementById('membership_term_billing_rate_hidden');
     const billingRateSuffix = document.getElementById('billing-rate-suffix');
+    const gymAccessStartDate = document.getElementById('gym_access_start_date');
+    const gymAccessEndDate = document.getElementById('gym_access_end_date');
+
     
-    if (!memberType || !membershipTerm || !baseRateField || !hiddenRateField || !billingRateSuffix) return;
+    
+    if (!memberType || !membershipTerm || !baseRateField || !hiddenRateField || !billingRateSuffix || !gymAccessStartDate) return;
     
     let rate = 0;
     
+    if(membershipTerm.value != 'None') {
+        gymAccessStartDate.value = new Date().toISOString().split('T')[0];
+    }
+    else{
+        gymAccessStartDate.value = '';
+    }
     // Base rates
-    if (membershipTerm.value === 'none') {
+    if (membershipTerm.value === 'None') {
         rate = 0;
     }
-    else if (membershipTerm.value === '1_month') {
+    else if (membershipTerm.value === '1 month') {
         rate = (memberType.value === 'student') ? 1000 : 1500;
-    } else if (membershipTerm.value === '3_months') {
+    } else if (membershipTerm.value === '3 months') {
         rate = (memberType.value === 'student') ? 2500 : 4500;
-    } else if (membershipTerm.value === 'walk_in') {
+    } else if (membershipTerm.value === 'Walk in') {
         rate = (memberType.value === 'student') ? 100 : 150;
     }
     
@@ -31,7 +41,7 @@ function updateMembershipTermBillingRate() {
     baseRateField.value = '₱' + rate.toLocaleString();
     
     // Update the billing rate suffix
-    billingRateSuffix.textContent = membershipTerm.value === 'walk_in' ? '/day' : '/month';
+    billingRateSuffix.textContent = membershipTerm.value === 'Walk in' ? '/day' : membershipTerm.value === '3 months' ? '/quarterly' : '/month';
 }
 
 // Function to update PT billing rate based on selection
@@ -47,7 +57,7 @@ function updatePtBillingRate() {
     if (withPt.value === 'none') {
         rate = 0;
     }
-    else if (withPt.value === '1_month') {
+    else if (withPt.value === '1 month') {
         rate = 3000;
     }
     // else rate remains 0
@@ -57,6 +67,7 @@ function updatePtBillingRate() {
     
     // Update the hidden field with raw numeric value
     hiddenPtBillingRateField.value = rate;
+    
 }
 
 // Add event listeners for base rate calculation
@@ -151,6 +162,7 @@ function showLogDetailsModal(log) {
             <div><span class="font-semibold">Purpose of Visit:</span> ${log.purpose_of_visit}</div>
             <div><span class="font-semibold">Staff Assigned:</span> ${log.staff_assigned}</div>
             <div><span class="font-semibold">Upgrade Gym Access:</span> ${upgrade_gym_access}</div>
+            <div><span class="font-semibold">Items Bought:</span> ${log.items_bought.join('\n')}</div>
             <div><span class="font-semibold">Notes:</span> ${log.notes}</div>
         </div>
     `;

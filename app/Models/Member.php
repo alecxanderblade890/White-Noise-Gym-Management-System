@@ -22,6 +22,8 @@ class Member extends Model
         'membership_term_gym_access',
         'member_type',
         'with_pt',
+        'pt_start_date',
+        'pt_end_date',
         'membership_term_billing_rate',
         'with_pt_billing_rate',
         'membership_start_date',

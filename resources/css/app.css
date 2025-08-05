@@ -10,6 +10,14 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+@font-face {
+    font-family: 'Glacial Indifference';
+    src: url('/fonts/GlacialIndifferenceRegular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* Custom CSS for sticky table header */
 tr[onclick] {
     cursor: pointer;
@@ -19,6 +27,10 @@ tr[onclick]:hover {
 }
 tr[onclick]:active {
     background-color: #e5e7eb !important;
+}
+
+body {
+    font-family: 'Glacial Indifference', sans-serif;
 }
 
 /* Custom scrollbar for table container */

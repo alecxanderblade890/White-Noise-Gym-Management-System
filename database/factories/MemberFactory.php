@@ -23,9 +23,11 @@ class MemberFactory extends Factory
         return [
             'full_name' => fake()->name(),
             'photo_url' => fake()->imageUrl(200, 200, 'people', true),
-            'membership_term_gym_access' => fake()->randomElement(['none', '1_month', '3_months', 'walk_in']),
+            'membership_term_gym_access' => fake()->randomElement(['None', '1 month', '3 months', 'Walk in']),
             'member_type' => fake()->randomElement(['Student', 'Regular']),
-            'with_pt' => fake()->randomElement(['none', '1_month']),
+            'with_pt' => fake()->randomElement(['None', '1 month']),
+            'pt_start_date' => fake()->date(),
+            'pt_end_date' => fake()->date(),
             'membership_start_date' => fake()->date(),
             'membership_end_date' => fake()->date(),
             'gym_access_start_date' => fake()->date(),

@@ -2,11 +2,7 @@
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-8">Daily Logs</h1>
 
-        @if(session('success'))
-            <div class="bg-green-200 text-green-800 p-4 mb-4 rounded-md">
-                {{ session('success') }}
-            </div>
-        @endif
+        <x-alert />
 
         <div class="bg-white shadow-md rounded-lg p-6 mb-8">
             <details {{ $errors->any() ? 'open' : '' }}>
@@ -48,16 +44,6 @@
                         </div>
 
                         <div>
-                            <label for="time_out" class="block text-sm font-medium text-gray-700 mb-1">Time out<span class="text-red-500">*</span></label>
-                            <input type="time" id="time_out" name="time_out" required
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   value="{{ old('time_out') }}">
-                            @error('time_out')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
                             <label for="member_id" class="block text-sm font-medium text-gray-700 mb-1">Member ID<span class="text-red-500">*</span></label>
                             <input type="number" id="member_id" name="member_id" required
                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -70,9 +56,9 @@
                         <div>
                             <label for="payment_method" class="block text-sm font-medium text-gray-700 mb-1">Payment Method<span class="text-red-500">*</span></label>
                             <select id="payment_method" name="payment_method" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="cash">Cash</option>
-                                <option value="card" {{ old('payment_method') == 'card' ? 'selected' : '' }}>Card</option>
-                                <option value="online" {{ old('payment_method') == 'online' ? 'selected' : '' }}>Online</option>
+                                <option value="Gcash">Gcash</option>
+                                <option value="Card">Card</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
                             </select>
                         </div>
 
@@ -115,9 +101,49 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea id="notes" name="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Items</label>
+                            <div class="space-y-2">
+                                @php
+                                    $commonItems = [
+                                        'Water Bottle',
+                                        'Towel',
+                                        'Protein Shake',
+                                        'Headphones',
+                                        'Gloves',
+                                        'Knee Sleeves',
+                                        'Lifting Belt',
+                                        'Jump Rope',
+                                        'Resistance Bands',
+                                        'Other'
+                                    ];
+                                @endphp
+                                
+                                <div class="grid grid-cols-2 gap-2">
+                                    @foreach($commonItems as $item)
+                                        <div class="flex items-center">
+                                            <input id="item-{{ $loop->index }}" name="items[]" type="checkbox" value="{{ $item }}" 
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="item-{{ $loop->index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ $item }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="mt-2">
+                                    <label for="custom_item" class="block text-sm font-medium text-gray-700 mb-1">Custom Item</label>
+                                    <input type="text" id="custom_item" name="custom_item" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="Enter custom item">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                            <textarea id="notes" name="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
                     </div>
 
                     <div>
@@ -148,7 +174,13 @@
                                 Member ID
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Membership Term
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Purpose
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Items Bought
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Amount Paid
@@ -161,7 +193,7 @@
                                 id: '{{ $dailyLog->id }}',
                                 date: '{{ \Carbon\Carbon::parse($dailyLog->date)->format('M d, Y') }}',
                                 time_in: '{{ \Carbon\Carbon::parse($dailyLog->time_in)->format('h:i A') }}',
-                                time_out: '{{ \Carbon\Carbon::parse($dailyLog->time_out)->format('h:i A') }}',
+                                time_out: '{{ $dailyLog->time_out ? \Carbon\Carbon::parse($dailyLog->time_out)->format('h:i A') : 'In Session' }}',
                                 member_id: '{{ $dailyLog->member_id ?? 'Not a Member Anymore' }}',
                                 full_name: '{{ $dailyLog->full_name ?? '' }}',
                                 membership_term_gym_access: '{{ $dailyLog->member->membership_term_gym_access ?? '0' }}',
@@ -170,6 +202,11 @@
                                 purpose_of_visit: '{{ $dailyLog->purpose_of_visit }}',
                                 staff_assigned: '{{ $dailyLog->staff_assigned ?? '' }}',
                                 upgrade_gym_access: '{{ $dailyLog->upgrade_gym_access ?? '' }}',
+                                items_bought: [
+                                    @foreach($dailyLog->items_bought as $item)
+                                        '{{ $item }}'{{ !$loop->last ? ',' : '' }}
+                                    @endforeach
+                                ],
                                 notes: '{{ $dailyLog->notes ?? '' }}'
                             })">
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -183,13 +220,30 @@
                                 </p>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <p class="text-gray-900 whitespace-no-wrap">
-                                    {{ \Carbon\Carbon::parse($dailyLog->time_out)->format('h:i A') }}
-                                </p>
+                                <form action="{{ route('daily-logs.update-time-out', $dailyLog->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to update the time out status?')">
+                                    @csrf
+                                    @method('POST')
+                                    <select 
+                                        name="time_out_status" 
+                                        class="border rounded px-2 py-1 text-sm" 
+                                        onchange="this.form.submit()"
+                                        onclick="event.stopPropagation()">
+                                        <option value="in_session" {{ is_null($dailyLog->time_out) ? 'selected' : '' }}>In Session</option>
+                                        <option value="time_out" {{ !is_null($dailyLog->time_out) ? 'selected' : '' }}>Time Out</option>
+                                    </select>
+                                </form>
+                                <span class="time-out-display ml-2">
+                                    {{ $dailyLog->time_out ? '('.\Carbon\Carbon::parse($dailyLog->time_out)->format('h:i A').')' : '' }}
+                                </span>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 <p class="text-gray-900 whitespace-no-wrap">
                                     {{ $dailyLog->member_id ?? 'Not a Member Anymore' }}
+                                </p>
+                            </td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">
+                                    {{ $dailyLog->member->membership_term_gym_access ?? 'None' }}
                                 </p>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -199,7 +253,14 @@
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 <p class="text-gray-900 whitespace-no-wrap">
-                                    PHP {{ $dailyLog->payment_amount }}
+                                    @foreach ($dailyLog->items_bought as $item)
+                                    <li>{{ $item }}</li>
+                                    @endforeach
+                                </p>
+                            </td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p class="text-gray-900 whitespace-no-wrap">
+                                    P{{ $dailyLog->payment_amount }}
                                 </p>
                             </td>
                         </tr>
@@ -228,6 +289,7 @@
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
 </x-layout>

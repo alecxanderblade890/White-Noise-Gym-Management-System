@@ -11,9 +11,9 @@
     <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Gym Members</h1>
 
     @if($members->isEmpty())
-    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-        <p class="font-bold">No Members Found</p>
-        <p>It looks like there are no members registered yet.</p>
+    <div class="bg-gray-100 border-l-4 border-gray-500 text-gray-700 p-4" role="alert">
+        <p class="font-bold text-gray-800">No Members Found</p>
+        <p class="text-gray-800">It looks like there are no members registered yet.</p>
     </div>
     @else
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -27,6 +27,7 @@
                         <th class="py-3 px-6 text-left w-64">Email</th>
                         <th class="py-3 px-6 text-left w-32">Phone</th>
                         <th class="py-3 px-6 text-left w-32">Member Type</th>
+                        <th class="py-3 px-6 text-left w-32">Membership Term Gym Access</th>
                         <th class="py-3 px-6 text-left w-40">Membership Start Date</th>
                         <th class="py-3 px-6 text-left w-48">Membership End Date</th>
                         <th class="py-3 px-6 text-left w-32">Gym Access Start Date</th>
@@ -60,13 +61,22 @@
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->email }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->phone_number }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->membership_term_gym_access }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ \Carbon\Carbon::parse($member->membership_start_date)->format('M d, Y') }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ \Carbon\Carbon::parse($member->membership_end_date)->format('M d, Y') }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->gym_access_start_date ? \Carbon\Carbon::parse($member->gym_access_start_date)->format('M d, Y') : '' }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->gym_access_end_date ? \Carbon\Carbon::parse($member->gym_access_end_date)->format('M d, Y') : '' }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->with_pt }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->membership_term_billing_rate }}</td>
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->with_pt_billing_rate }}</td>
+                            @if($member->membership_term_gym_access == 'None')
+                                <td class="py-3 px-6 text-left whitespace-nowrap">₱0</td>
+                            @elseif($member->membership_term_gym_access == '1 month')
+                                <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type == 'Student' ? '₱1000/Month' : '₱1500/Month' }}</td>
+                            @elseif($member->membership_term_gym_access == '3 months')
+                                <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type == 'Student' ? '₱2500/3 Months' : '₱4500/3 Months' }}</td>
+                            @elseif($member->membership_term_gym_access == 'Walk in')
+                                <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type == 'Student' ? '₱100/day' : '₱150/day' }}</td>
+                            @endif
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->with_pt == '1 month' ? '₱3000/Month' : '₱0' }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->address }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ \Carbon\Carbon::parse($member->date_of_birth)->format('M d, Y') }} ({{ \Carbon\Carbon::parse($member->date_of_birth)->age }} yrs)</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->id_presented }}</td>

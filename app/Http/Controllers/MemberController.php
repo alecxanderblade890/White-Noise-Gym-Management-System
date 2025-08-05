@@ -63,6 +63,8 @@ class MemberController extends Controller
             'with_pt_billing_rate' => 'required|numeric|min:0',
             'gym_access_start_date' => 'nullable|date',
             'gym_access_end_date' => 'nullable|date',
+            'pt_start_date' => 'nullable|date',
+            'pt_end_date' => 'nullable|date',
             'emergency_contact_person' => 'required|string|max:255',
             'emergency_contact_number' => 'required|string|max:20',
             'notes' => 'nullable|string|max:500',
@@ -70,6 +72,7 @@ class MemberController extends Controller
 
         if ($memberId) {
             $rules['email'] = 'required|email|max:255|unique:members,email,' . $memberId;
+            
         }
 
         return Validator::make($request->all(), $rules);
@@ -91,6 +94,16 @@ class MemberController extends Controller
         ]);
 
         try {
+            
+            if ($validated['membership_term_gym_access'] === '1 month') {
+                $validated['gym_access_start_date'] = now()->toDateString();
+                $validated['gym_access_end_date'] = now()->addMonth()->toDateString();
+            }
+            elseif ($validated['membership_term_gym_access'] === '3 months') {
+                $validated['gym_access_start_date'] = now()->toDateString();
+                $validated['gym_access_end_date'] = now()->addMonths(3)->toDateString();
+            }
+
             Member::create([
                 'photo_url' => $result['secure_url'],
                 'full_name' => $validated['full_name'],
@@ -106,6 +119,8 @@ class MemberController extends Controller
                 'membership_end_date' => now()->addYear()->toDateString(), 
                 'gym_access_start_date' => $validated['gym_access_start_date'] ?? null,
                 'gym_access_end_date' => $validated['gym_access_end_date'] ?? null,
+                'pt_start_date' => $validated['pt_start_date'] ?? null,
+                'pt_end_date' => $validated['pt_end_date'] ?? null,
                 'membership_term_gym_access' => $validated['membership_term_gym_access'],
                 'member_type' => $validated['member_type'],
                 'with_pt' => $validated['with_pt'],
@@ -141,7 +156,7 @@ class MemberController extends Controller
 
         try {
             $member->update($validated);
-            return redirect()->route('member-details.show', $member->id)->with('success', '');
+            return redirect()->route('member-details.show', $member->id)->with('success', 'Member updated successfully!');
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->validator)->withInput();
         }

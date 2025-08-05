@@ -18,5 +18,6 @@ Route::post('/add-daily-log', [DailyLogController::class, 'addDailyLog'])->name(
 Route::get('/get-daily-logs', [DailyLogController::class, 'getDailyLogs'])->name('get-daily-logs');
 Route::get('/daily-log-details', [DailyLogController::class, 'getDailyLogDetail'])->name('daily-log-details.show');
 Route::delete('/daily-logs/{id}', [DailyLogController::class, 'deleteDailyLog'])->name('daily-logs.delete');
+Route::post('/daily-logs/update-time-out/{id}', [DailyLogController::class, 'updateTimeOut'])->name('daily-logs.update-time-out');
 
 

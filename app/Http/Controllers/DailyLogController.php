@@ -15,14 +15,16 @@ class DailyLogController extends Controller
         $validated = $request->validate([
             'date' => 'required|date',
             'time_in' => 'required|date_format:H:i',
-            'time_out' => 'required|date_format:H:i',
+            'time_out' => 'nullable|date_format:H:i',
             'member_id' => 'required|integer|exists:members,id',
-            'payment_method' => 'required|in:cash,card,online',
+            'payment_method' => 'required|in:Gcash,Card,Bank Transfer',
             'payment_amount' => 'required|integer|min:0',
             'purpose_of_visit' => 'required|string|max:255',
             'staff_assigned' => 'required|string|max:255',
             'upgrade_gym_access' => 'required|in:yes,no',
-            'notes' => 'string|nullable'
+            'items' => 'nullable|array',
+            'custom_item' => 'nullable|string|max:255',
+            'notes' => 'nullable|string'
         ]);
 
         try {
@@ -31,10 +33,20 @@ class DailyLogController extends Controller
 
             $upgradeGymAccess = $validated['upgrade_gym_access'] === 'yes' ? 1 : 0;
 
+            $items = $request->input('items', []);
+
+            // Check if a custom item was provided and add it to the array
+            if ($request->filled('custom_item')) {
+                $items[] = $request->input('custom_item');
+            }
+            
+            // Remove duplicate items and reindex array
+            $items = array_values(array_unique($items));
+            
             DailyLog::create([
                 'date' => $validated['date'],
                 'time_in' => $validated['time_in'],
-                'time_out' => $validated['time_out'],
+                'time_out' => $validated['time_out'] ?? null,
                 'member_id' => $validated['member_id'],
                 'full_name' => $member->full_name,
                 'payment_method' => $validated['payment_method'],
@@ -43,6 +55,7 @@ class DailyLogController extends Controller
                 'staff_assigned' => $validated['staff_assigned'],
                 'upgrade_gym_access' => $upgradeGymAccess,
                 'notes' => $validated['notes'],
+                'items_bought' => $items
             ]);
             
             session()->flash('success', 'Daily Log added successfully!');
@@ -67,6 +80,25 @@ class DailyLogController extends Controller
             return redirect()->route('get-daily-logs')->with('success', 'Daily log deleted successfully!');
         }
         return redirect()->route('get-daily-logs')->with('error', 'Daily log not found!');
+    }
+
+    public function updateTimeOut(Request $request, $id)
+    {
+        $request->validate([
+            'time_out_status' => 'required|in:time_out,in_session'
+        ]);
+
+        $dailyLog = DailyLog::findOrFail($id);
+        
+        if ($request->time_out_status === 'time_out') {
+            $dailyLog->time_out = now();
+        } else {
+            $dailyLog->time_out = null;
+        }
+        
+        $dailyLog->save();
+
+        return redirect()->route('get-daily-logs')->with('success', 'Time out updated successfully!');
     }
 }
 

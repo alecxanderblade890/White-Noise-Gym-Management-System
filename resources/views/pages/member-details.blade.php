@@ -1,4 +1,5 @@
 <x-layout>
+
     <!-- Edit Profile Modal -->
     <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-4 md:p-8 relative overflow-y-auto" style="max-height:90vh;">
@@ -90,8 +91,8 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Member Type</label>
                         <select id="member_type" name="member_type" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="student" {{ $member->member_type == 'Student' ? 'selected' : '' }}>Student</option>
-                            <option value="regular" {{ $member->member_type == 'Regular' ? 'selected' : '' }}>Regular</option>
+                            <option value="Student" {{ $member->member_type == 'Student' ? 'selected' : '' }}>Student</option>
+                            <option value="Regular" {{ $member->member_type == 'Regular' ? 'selected' : '' }}>Regular</option>
                         </select>                
                     </div>
 
@@ -114,20 +115,22 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Membership Term (Gym Access)</label>
+                        <input type="hidden" id="membership_term_billing_rate_hidden" name="membership_term_billing_rate" value="0">
                         <select id="membership_term_gym_access" name="membership_term_gym_access" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="none" {{ $member->membership_term_gym_access == 'none' ? 'selected' : '' }}>None</option>
-                            <option value="1_month" {{ $member->membership_term_gym_access == '1_month' ? 'selected' : '' }}>1 Month</option>
-                            <option value="3_months" {{ $member->membership_term_gym_access == '3_months' ? 'selected' : '' }}>3 Months</option>
-                            <option value="walk_in" {{ $member->membership_term_gym_access == 'walk_in' ? 'selected' : '' }}>Walk In</option>
+                            <option value="None" {{ $member->membership_term_gym_access == 'None' ? 'selected' : '' }}>None</option>
+                            <option value="1 month" {{ $member->membership_term_gym_access == '1 month' ? 'selected' : '' }}>1 Month</option>
+                            <option value="3 months" {{ $member->membership_term_gym_access == '3 months' ? 'selected' : '' }}>3 Months</option>
+                            <option value="Walk in" {{ $member->membership_term_gym_access == 'Walk in' ? 'selected' : '' }}>Walk In</option>
                         </select>                
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">With Personal Trainer</label>
+                        <input type="hidden" id="with_pt_billing_rate_hidden" name="with_pt_billing_rate" value="0">
                         <select id="with_pt" name="with_pt" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="none" {{ $member->with_pt == 'None' ? 'selected' : '' }}>None</option>
-                            <option value="1 month" {{ $member->with_pt == '1 Month' ? 'selected' : '' }}>1 Month</option>
+                            <option value="None" {{ $member->with_pt == 'None' ? 'selected' : '' }}>None</option>
+                            <option value="1 month" {{ $member->with_pt == '1 month' ? 'selected' : '' }}>1 Month</option>
                         </select>                
                     </div>
                     <div>
@@ -158,6 +161,8 @@
             </svg>
             Back to Members
         </a>
+
+        <x-alert />
 
         <!-- Profile Card -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
@@ -197,11 +202,10 @@
                     @endif
                     @if($member->pt_start_date && $member->pt_end_date)
                         <span class="mt-2 px-4 py-1 rounded-full text-sm font-medium {{ $isActivePT ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                            {{ $isActivePT ? 'Active' : 'Expired' }} PT
+                            {{ $isActivePT ? 'Active' : 'Expired' }} Personal Training
                         </span>
                     @endif
                 </div>
-
                 <!-- Member Details -->
                 <div class="md:w-3/4 p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -244,7 +248,7 @@
                             <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Membership Details</h2>
                             <div>
                                 <p class="text-sm text-gray-500">Membership Term</p>
-                                <p class="font-medium">{{ $member->membership_term_gym_access == 'None' ? 'None' : $member->membership_term_gym_access . 'month' }}</p>
+                                <p class="font-medium">{{ $member->membership_term_gym_access == 'none' ? 'None' : $member->membership_term_gym_access }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Membership Start Date</p>
@@ -278,10 +282,31 @@
                                     </p>
                                 @endif
                             </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Personal Trainer Start Date</p>
+                                <p class="font-medium">{{ $member->pt_start_date ? \Carbon\Carbon::parse($member->pt_start_date)->format('F j, Y') : 'No Personal Trainer Active' }}</p>
+                            </div>
+                            <div>
+                                @if($member->with_pt === '1 month')
+                                    <p class="text-sm text-gray-500">Personal Trainer End Date</p>
+                                    <p class="font-medium {{ $isActivePT ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ \Carbon\Carbon::parse($member->pt_end_date)->format('F j, Y') }}
+                                        @if($isActivePT)
+                                            ({{ (int)(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now()) * -1 + 1) }} days remaining)
+                                        @else
+                                            (Expired {{ round(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) *-1 }} days ago)
+                                        @endif
+                                    </p>
+                                @endif
+                            </div>
                         </div>
-
+                        <!-- Billing Rates -->
                         <div class="space-y-4">
                             <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Billing Rates</h2>
+                            <div>
+                                <p class="text-sm text-gray-500">Member Type:</p>
+                                <p class="font-medium"> {{ $member->member_type }}</p>
+                            </div>
                             <div>
                                 <p class="text-sm text-gray-500">Membership Rate:</p>
                                 <p class="font-medium"> ₱ 500/year</p>
@@ -290,19 +315,19 @@
                                 <p class="text-sm text-gray-500">Gym Access Rate:</p>
                                 @if($member->membership_term_gym_access == 'None')
                                     <p class="font-medium">None</p>
-                                @elseif($member->membership_term_gym_access == 'Walk In')
+                                @elseif($member->membership_term_gym_access == 'Walk in')
                                     <p class="font-medium">{{ $member->member_type == 'Student' ? '₱ 100/day' : '₱ 150/day' }}</p>
-                                @elseif($member->membership_term_gym_access == '1 Month')
+                                @elseif($member->membership_term_gym_access == '1 month')
                                     <p class="font-medium">{{ $member->member_type == 'Student' ? '₱ 1,000/month' : '₱ 1,500/month' }}</p>
-                                @elseif($member->membership_term_gym_access == '3 Months')
-                                    <p class="font-medium">{{ $member->member_type == 'Student' ? '₱ 2,500/month' : '₱ 4,500/month' }}</p>
+                                @elseif($member->membership_term_gym_access == '3 months')
+                                    <p class="font-medium">{{ $member->member_type == 'Student' ? '₱ 2,500 per quarter' : '₱ 4,500 per quarter' }}</p>
                                 @endif
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Personal Trainer Rate:</p>
                                 @if($member->with_pt == 'None')
                                     <p class="font-medium">None</p>
-                                @elseif($member->with_pt == '1 Month')
+                                @elseif($member->with_pt == '1 month')
                                     <p class="font-medium"> ₱ 3,000/month</p>
                                 @endif
                             </div>

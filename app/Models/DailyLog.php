@@ -22,11 +22,13 @@ class DailyLog extends Model
         'purpose_of_visit',
         'staff_assigned',
         'upgrade_gym_access',
+        'items_bought',
         'notes',
     ];
 
     protected $casts = [
         'member_id' => 'integer',
+        'items_bought' => 'array',
     ];
 
     protected $nullable = [

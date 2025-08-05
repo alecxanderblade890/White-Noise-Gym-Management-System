@@ -28,7 +28,7 @@
                 
                 <div class="flex items-center space-x-6">
                     <div class="shrink-0">
-                        <img id="photo-preview" class="h-20 w-20 rounded-full object-cover" src="{{ asset('images/default-avatar.png') }}" alt="Profile photo preview">
+                        <img id="photo-preview" class="h-20 w-20 rounded-full object-cover" src="{{ asset('images/placeholder_profile.png') }}" alt="Profile photo preview">
                     </div>
                     <label class="block">
                     <span class="sr-only">Choose profile photo</span>
@@ -36,8 +36,8 @@
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-md file:border-0
                         file:text-sm file:font-semibold
-                        file:bg-blue-50 file:text-blue-700
-                        hover:file:bg-blue-100"
+                        file:bg-gray-200 file:text-gray-700
+                        hover:file:bg-gray-300"
                         onchange="document.getElementById('photo-preview').src = window.URL.createObjectURL(this.files[0])" require>
                     </label>
                 </div>
@@ -207,9 +207,9 @@
                             <select id="membership_term_gym_access" name="membership_term_gym_access" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="None" {{ old('membership_term_gym_access') == 'None' ? 'selected' : '' }}>None</option>
-                                <option value="1_month" {{ old('membership_term_gym_access') == '1_month' ? 'selected' : '' }}>1 Month</option>
-                                <option value="3_months" {{ old('membership_term_gym_access') == '3_months' ? 'selected' : '' }}>3 Months</option>
-                                <option value="walk_in" {{ old('membership_term_gym_access') == 'walk_in' ? 'selected' : '' }}>Walk In</option>
+                                <option value="1 month" {{ old('membership_term_gym_access') == '1 month' ? 'selected' : '' }}>1 Month</option>
+                                <option value="3 months" {{ old('membership_term_gym_access') == '3 months' ? 'selected' : '' }}>3 Months</option>
+                                <option value="Walk in" {{ old('membership_term_gym_access') == 'Walk in' ? 'selected' : '' }}>Walk In</option>
                             </select>
                             @error('membership_term_gym_access')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -221,7 +221,7 @@
                             <div class="mt-1 flex items-center">
                                 <input type="hidden" id="membership_term_billing_rate_hidden" name="membership_term_billing_rate" value="0">
                                 <input type="text" id="membership_term_billing_rate" readonly
-                                    class="flex-1 pl-4 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-700 focus:outline-none"
+                                    class="w-full pl-4 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-700 focus:outline-none"
                                     value="₱0">
                                 <span id="billing-rate-suffix" class="flex-1 px-4 py-2 border border-gray-300 rounded-r-md bg-gray-50 text-gray-700 focus:outline-none">
                                     /month
@@ -236,7 +236,7 @@
                             <select id="with_pt" name="with_pt" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="none" {{ old('with_pt') == 'none' ? 'selected' : '' }}>None</option>
-                                <option value="1_month" {{ old('with_pt') == '1_month' ? 'selected' : '' }}>1 Month</option>
+                                <option value="1 month" {{ old('with_pt') == '1 month' ? 'selected' : '' }}>1 Month</option>
                             </select>
                             @error('with_pt')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -245,10 +245,15 @@
                         <!-- With PT Billing Rate -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">With Personal Trainer Billing Rate</label>
-                            <input type="hidden" id="with_pt_billing_rate_hidden" name="with_pt_billing_rate" value="0">
-                            <input type="text" id="with_pt_billing_rate" readonly
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
-                                value="0">
+                            <div class="mt-1 flex items-center">
+                                <input type="hidden" id="with_pt_billing_rate_hidden" name="with_pt_billing_rate" value="0">
+                                <input type="text" id="with_pt_billing_rate" readonly
+                                    class="flex-1 pl-4 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-700 focus:outline-none"
+                                    value="₱0">
+                                <span id="billing-rate-suffix" class="flex-1 px-4 py-2 border border-gray-300 rounded-r-md bg-gray-50 text-gray-700 focus:outline-none">
+                                    /month
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <!-- Membership Period -->
