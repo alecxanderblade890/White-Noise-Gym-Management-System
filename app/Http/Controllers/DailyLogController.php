@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Models\DailyLog;
 use App\Models\Member;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class DailyLogController extends Controller
 {
@@ -30,6 +32,16 @@ class DailyLogController extends Controller
         try {
             // Get the member first
             $member = Member::findOrFail($validated['member_id']);
+
+            // Check if member's gym access has expired
+            $today = now()->startOfDay();
+            $gymAccessEndDate = $member->gym_access_end_date ? \Carbon\Carbon::parse($member->gym_access_end_date)->startOfDay() : null;
+            
+            if (!$gymAccessEndDate || $today->gt($gymAccessEndDate)) {
+                return redirect()->back()
+                    ->withErrors(['member_id' => "This member's gym access term has expired. Please renew their gym access term."])
+                    ->withInput();
+            }
 
             $upgradeGymAccess = $validated['upgrade_gym_access'] === 'yes' ? 1 : 0;
 
@@ -72,14 +84,23 @@ class DailyLogController extends Controller
         return view('pages.daily-logs', compact('dailyLogs'));
     }
 
-    public function deleteDailyLog(Request $request)
+    public function deleteDailyLog(Request $request, $id)
     {
-        $dailyLog = DailyLog::find($request->id);
-        if ($dailyLog) {
-            $dailyLog->delete();
-            return redirect()->route('get-daily-logs')->with('success', 'Daily log deleted successfully!');
+        $request->validate([
+            'password' => 'required|string',
+        ]);
+
+        // Find the admin user and verify the password
+        $adminUser = User::where('username', 'admin_access')->first();
+        
+        if (!$adminUser || $adminUser->password !== $request->password) {
+            return redirect()->back()->with('error', 'Incorrect admin password. Deletion cancelled.');
         }
-        return redirect()->route('get-daily-logs')->with('error', 'Daily log not found!');
+
+        $dailyLog = DailyLog::findOrFail($id);
+        $dailyLog->delete();
+        
+        return redirect()->route('get-daily-logs')->with('success', 'Daily log deleted successfully!');
     }
 
     public function updateTimeOut(Request $request, $id)

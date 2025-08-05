@@ -10,6 +10,8 @@
         </a>
     <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Gym Members</h1>
 
+    <x-alert />
+
     @if($members->isEmpty())
     <div class="bg-gray-100 border-l-4 border-gray-500 text-gray-700 p-4" role="alert">
         <p class="font-bold text-gray-800">No Members Found</p>

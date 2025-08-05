@@ -7,6 +7,8 @@ use App\Models\Member;
 use Cloudinary\Cloudinary;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class MemberController extends Controller
 {
@@ -161,13 +163,24 @@ class MemberController extends Controller
             return redirect()->back()->withErrors($e->validator)->withInput();
         }
     }
-    public function deletedMember($id)
+    public function deletedMember(Request $request, $id)
     {
+        $request->validate([
+            'password' => 'required|string'
+        ]);
+
+        // Find the admin user and verify the password
+        $adminUser = User::where('username', 'admin_access')->first();
+        
+        if (!$adminUser || $adminUser->password !== $request->password) {
+            return redirect()->back()->with('error', 'Incorrect admin password. Deletion cancelled.');
+        }
+
         $member = Member::findOrFail($id);
 
         try {
             $member->delete();
-            return redirect()->route('members.index')->with('success', 'Member deleted successfully!');
+            return redirect()->route('manage-members.index')->with('success', 'Member deleted successfully!');
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->validator)->withInput();
         }

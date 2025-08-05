@@ -200,6 +200,11 @@
                             {{ $isActiveGymAccess ? 'Active' : 'Expired' }} Gym Access
                         </span>
                     @endif
+                    @if($member->membership_term_gym_access === 'Walk in')
+                        <span class="mt-2 px-4 py-1 rounded-full text-sm font-medium {{ $isActiveMembership ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                            {{ $isActiveMembership ? 'Active' : 'Expired' }} Walk In
+                        </span>
+                    @endif
                     @if($member->pt_start_date && $member->pt_end_date)
                         <span class="mt-2 px-4 py-1 rounded-full text-sm font-medium {{ $isActivePT ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                             {{ $isActivePT ? 'Active' : 'Expired' }} Personal Training

@@ -1,4 +1,4 @@
-@props(['type' => 'success', 'dismissible' => true])
+@props(['dismissible' => true])
 
 @php
     $colors = [
@@ -8,44 +8,38 @@
         'info' => 'bg-blue-200 text-blue-800',
     ];
     
-    $iconColors = [
-        'success' => 'text-green-700 hover:text-green-900',
-        'error' => 'text-red-700 hover:text-red-900',
-        'warning' => 'text-yellow-700 hover:text-yellow-900',
-        'info' => 'text-blue-700 hover:text-blue-900',
-    ];
-    
-    $icon = [
+    $icons = [
         'success' => '✓',
         'error' => '✕',
         'warning' => '!',
         'info' => 'i',
     ];
     
-    $color = $colors[$type] ?? $colors['success'];
-    $iconColor = $iconColors[$type] ?? $iconColors['success'];
-    $iconSymbol = $icon[$type] ?? $icon['success'];
+    // Get the first available message type from the session
+    $messageType = collect(['success', 'error', 'warning', 'info'])
+        ->first(fn($type) => session()->has($type));
+    
+    // If no message type found, don't show anything
+    if (!$messageType) {
+        return;
+    }
+    
+    $message = session($messageType);
+    $color = $colors[$messageType];
+    $icon = $icons[$messageType];
+    $dismissButtonClass = str_replace('text-', 'hover:', $color) . ' font-bold text-xl leading-none';
 @endphp
 
-@if(session()->has('success') || session()->has('error') || session()->has('warning') || session()->has('info'))
-    @php
-        $messageType = session('success') ? 'success' : 
-                      (session('error') ? 'error' : 
-                      (session('warning') ? 'warning' : 'info'));
-        $message = session($messageType);
-    @endphp
-    
-    <div x-data="{ show: true }" 
-         x-show="show" 
-         x-init="setTimeout(() => show = false, 5000)"
-         {{ $attributes->merge(['class' => "$color p-4 mb-4 rounded-md flex items-start"]) }}>
-        <span class="mr-2">{{ $iconSymbol }}</span>
-        <span class="flex-1">{{ $message }}</span>
-        @if($dismissible)
-            <button @click="show = false" 
-                    class="ml-2 $iconColor font-bold text-xl leading-none">
-                &times;
-            </button>
-        @endif
-    </div>
-@endif
+<div x-data="{ show: true }" 
+     x-show="show" 
+     x-init="setTimeout(() => show = false, 5000)"
+     class="{{ $color }} p-4 mb-4 rounded-md flex items-start">
+    <span class="mr-2">{{ $icon }}</span>
+    <span class="flex-1">{{ $message }}</span>
+    @if($dismissible)
+        <button @click="show = false" 
+                class="ml-2 {{ $dismissButtonClass }}">
+            &times;
+        </button>
+    @endif
+</div>
