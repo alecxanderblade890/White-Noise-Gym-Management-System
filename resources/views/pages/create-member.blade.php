@@ -1,24 +1,13 @@
 <x-layout>
     <div class="container mx-auto px-4 py-8">
         <!-- Back button -->
-        <a href="{{ route('manage-members.index') }}" class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
+        <x-navigate-back :href="route('manage-members.index')">
             Back
-        </a>
+        </x-navigate-back>
+        
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Register New Member</h1>
 
-        @if ($errors->any())
-            <div class="mb-4">
-                <div class="text-red-600 font-semibold">Please fix the following errors:</div>
-                <ul class="list-disc list-inside text-red-500">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <x-error-message/>
         
         <form action="{{route('add-member')}}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
@@ -258,6 +247,8 @@
                     </div>
                     <!-- Membership Period -->
                     <div>
+                        <input type="hidden" id="current_end_date" value="">
+                        <input type="hidden" id="gym_access_end_date" class="hidden" readonly>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Membership Period <span class="text-red-500">*</span></label>
                         <div class="flex items-center space-x-2">
                             <input type="text" readonly
@@ -280,9 +271,9 @@
                     <!-- Payment Date (Gym Access) -->
                     <div>
                         <label for="gym_access_start_date" class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Gym Access)</label>
-                        <input type="date" id="gym_access_start_date" name="gym_access_start_date"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="" placeholder="Enter payment date">
+                        <input type="text" id="gym_access_start_date" name="gym_access_start_date" readonly
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                               value="{{ old('gym_access_start_date') }}">
                         @error('gym_access_start_date')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -342,7 +333,7 @@
                     Cancel
                 </a>
                 <button type="submit" 
-                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Register Member
                 </button>
             </div>

@@ -107,17 +107,13 @@
                             <div class="space-y-2">
                                 @php
                                     $commonItems = [
-                                        'Water Bottle',
-                                        'Towel',
-                                        'Protein Shake',
-                                        'Headphones',
-                                        'Gloves',
-                                        'Knee Sleeves',
-                                        'Lifting Belt',
-                                        'Jump Rope',
-                                        'Resistance Bands',
+                                        'Pocari Sweat',
+                                        'Gatorade Blue',
+                                        'Gatorade Red',
+                                        'Bottled Water',
                                         'Other'
                                     ];
+
                                 @endphp
                                 
                                 <div class="grid grid-cols-2 gap-2">
@@ -127,6 +123,30 @@
                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                             <label for="item-{{ $loop->index }}" class="ml-2 block text-sm text-gray-700">
                                                 {{ $item }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 mt-4">T-Shirts</label>
+                            <div class="space-y-2">
+                                @php
+                                $tShirts = [
+                                        'White - Large',
+                                        'White - XL',
+                                        'Black - Large',
+                                        'Black - XL',
+                                        'Black - XS',
+                                        'Black - Medium',
+                                    ];
+                                @endphp
+                                <div class="grid grid-cols-2 gap-2">
+                                    @foreach($tShirts as $index => $tShirt)
+                                        <div class="flex items-center">
+                                            <input id="tshirt-{{ $index }}" name="t_shirts[]" type="checkbox" value="{{ $tShirt }}" 
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="tshirt-{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ $tShirt }}
                                             </label>
                                         </div>
                                     @endforeach

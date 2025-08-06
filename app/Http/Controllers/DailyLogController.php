@@ -46,14 +46,18 @@ class DailyLogController extends Controller
             $upgradeGymAccess = $validated['upgrade_gym_access'] === 'yes' ? 1 : 0;
 
             $items = $request->input('items', []);
+            $tShirts = $request->input('t_shirts', []);
 
-            // Check if a custom item was provided and add it to the array
+            // Check if a custom item was provided and add it to the items array
             if ($request->filled('custom_item')) {
                 $items[] = $request->input('custom_item');
             }
             
+            // Combine items and t-shirts into a single array for storage
+            $allItems = array_merge($items, $tShirts);
+            
             // Remove duplicate items and reindex array
-            $items = array_values(array_unique($items));
+            $allItems = array_values(array_unique($allItems));
             
             DailyLog::create([
                 'date' => $validated['date'],
@@ -67,7 +71,7 @@ class DailyLogController extends Controller
                 'staff_assigned' => $validated['staff_assigned'],
                 'upgrade_gym_access' => $upgradeGymAccess,
                 'notes' => $validated['notes'],
-                'items_bought' => $items
+                'items_bought' => $allItems
             ]);
             
             session()->flash('success', 'Daily Log added successfully!');

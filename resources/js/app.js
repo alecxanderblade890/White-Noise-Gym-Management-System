@@ -9,6 +9,7 @@ function updateMembershipTermBillingRate() {
     const billingRateSuffix = document.getElementById('billing-rate-suffix');
     const gymAccessStartDate = document.getElementById('gym_access_start_date');
     const gymAccessEndDate = document.getElementById('gym_access_end_date');
+    const currentEndDate = document.getElementById('current_end_date');
 
     
     
@@ -17,10 +18,28 @@ function updateMembershipTermBillingRate() {
     let rate = 0;
     
     if(membershipTerm.value != 'None') {
-        gymAccessStartDate.value = new Date().toISOString().split('T')[0];
+        
+        const date = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        gymAccessStartDate.value = date.toLocaleDateString('en-US', options);
+
+        if(membershipTerm.value == '1 month') {
+            const endDate = currentEndDate.value ? new Date(currentEndDate.value) : new Date();
+            endDate.setMonth(endDate.getMonth() + 1);
+            gymAccessEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        else if(membershipTerm.value == '3 months') {
+            const endDate = currentEndDate.value ? new Date(currentEndDate.value) : new Date();
+            endDate.setMonth(endDate.getMonth() + 3);
+            gymAccessEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        else if(membershipTerm.value == 'Walk in') {
+            gymAccessEndDate.value = '';
+        }
     }
-    else{
+    else {
         gymAccessStartDate.value = '';
+        gymAccessEndDate.value = '';
     }
     // Base rates
     if (membershipTerm.value === 'None') {
@@ -47,6 +66,9 @@ function updateMembershipTermBillingRate() {
 // Function to update PT billing rate based on selection
 function updatePtBillingRate() {
     const withPt = document.getElementById('with_pt');
+    const currentEndDatePt = document.getElementById('current_end_date_pt');
+    const ptStartDate = document.getElementById('pt_start_date');
+    const ptEndDate = document.getElementById('pt_end_date');
     const ptBillingRateField = document.getElementById('with_pt_billing_rate');
     const hiddenPtBillingRateField = document.getElementById('with_pt_billing_rate_hidden');
     
@@ -54,13 +76,21 @@ function updatePtBillingRate() {
     
     let rate = 0;
     
-    if (withPt.value === 'none') {
-        rate = 0;
-    }
-    else if (withPt.value === '1 month') {
+
+    if (withPt.value === '1 month') {
         rate = 3000;
+        const date = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        ptStartDate.value = date.toLocaleDateString('en-US', options);
+        const endDate = currentEndDatePt.value ? new Date(currentEndDatePt.value) : new Date();
+        endDate.setMonth(endDate.getMonth() + 1);
+        ptEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     }
-    // else rate remains 0
+    else if (withPt.value === 'None') {
+        rate = 0;
+        ptStartDate.value = null;
+        ptEndDate.value = null;
+    }
     
     // Update the PT billing rate field
     ptBillingRateField.value = '₱' + rate.toLocaleString();
@@ -69,40 +99,6 @@ function updatePtBillingRate() {
     hiddenPtBillingRateField.value = rate;
     
 }
-
-// Add event listeners for base rate calculation
-document.addEventListener('DOMContentLoaded', function() {
-    const memberType = document.getElementById('member_type');
-    const membershipTerm = document.getElementById('membership_term_gym_access');
-    const billingRateSuffix = document.getElementById('billing-rate-suffix');
-    
-    // Update billing rate suffix when membership term changes
-    if (membershipTerm && billingRateSuffix) {
-        membershipTerm.addEventListener('change', function() {
-            billingRateSuffix.textContent = this.value === 'walk_in' ? '/day' : '/month';
-        });
-        
-        // Initialize on page load
-        billingRateSuffix.textContent = membershipTerm.value === 'walk_in' ? '/day' : '/month';
-    }
-    const withPt = document.getElementById('with_pt');
-    
-    // Base rate event listeners
-    if (memberType && membershipTerm) {
-        memberType.addEventListener('change', updateMembershipTermBillingRate);
-        membershipTerm.addEventListener('change', updateMembershipTermBillingRate);
-        
-        // Calculate initial base rate
-        updateMembershipTermBillingRate();
-    }
-    
-    // PT billing rate event listener
-    if (withPt) {
-        withPt.addEventListener('change', updatePtBillingRate);
-        // Set initial PT billing rate
-        updatePtBillingRate();
-    }
-});
 
 function openModal() {
     document.getElementById('editProfileModal').classList.remove('hidden');
@@ -212,4 +208,61 @@ if (deleteMemberBtn) {
     });
 }
 
+// Add event listeners for base rate calculation
+document.addEventListener('DOMContentLoaded', function() {
+    const memberType = document.getElementById('member_type');
+    const membershipTerm = document.getElementById('membership_term_gym_access');
+    const billingRateInput = document.getElementById('membership_term_billing_rate_hidden');
+    const billingRateSuffix = document.getElementById('billing-rate-suffix');
 
+    // Helper to sync modal hidden inputs
+    function syncModalFields() {
+        const modalMemberType = document.getElementById('modal-member-type-confirmRenewalTermModal');
+        const modalMembershipTerm = document.getElementById('modal-membership-term-confirmRenewalTermModal');
+        const modalBillingRate = document.getElementById('modal-billing-rate-confirmRenewalTermModal');
+
+        if (modalMemberType && modalMembershipTerm && modalBillingRate) {
+            modalMemberType.value = memberType ? memberType.value : '';
+            modalMembershipTerm.value = membershipTerm ? membershipTerm.value : '';
+            modalBillingRate.value = billingRateInput ? billingRateInput.value : '';
+        }
+    }
+
+    // Sync on load
+    syncModalFields();
+
+    // Sync whenever the source fields change
+    [memberType, membershipTerm, billingRateInput].forEach(function(el) {
+        if (el) {
+            el.addEventListener('change', syncModalFields);
+            el.addEventListener('input', syncModalFields);
+        }
+    });
+    
+    // Update billing rate suffix when membership term changes
+    if (membershipTerm && billingRateSuffix) {
+        membershipTerm.addEventListener('change', function() {
+            billingRateSuffix.textContent = this.value === 'walk_in' ? '/day' : '/month';
+        });
+        
+        // Initialize on page load
+        billingRateSuffix.textContent = membershipTerm.value === 'walk_in' ? '/day' : '/month';
+    }
+    const withPt = document.getElementById('with_pt');
+    
+    // Base rate event listeners
+    if (memberType && membershipTerm) {
+        memberType.addEventListener('change', updateMembershipTermBillingRate);
+        membershipTerm.addEventListener('change', updateMembershipTermBillingRate);
+        
+        // Calculate initial base rate
+        updateMembershipTermBillingRate();
+    }
+    
+    // PT billing rate event listener
+    if (withPt) {
+        withPt.addEventListener('change', updatePtBillingRate);
+        // Set initial PT billing rate
+        updatePtBillingRate();
+    }
+});

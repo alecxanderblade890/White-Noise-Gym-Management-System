@@ -6,16 +6,8 @@
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Member Profile</h2>
 
-            @if ($errors->any())
-                <div class="mb-4">
-                    <div class="text-red-600 font-semibold">Please fix the following errors:</div>
-                    <ul class="list-disc list-inside text-red-500">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            <x-error-message/>
+
             <form action="{{ route('update-member', $member->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
@@ -155,12 +147,9 @@
     />
     <div class="container mx-auto px-4 py-8">
         <!-- Back button -->
-        <a href="{{ route('members.index') }}" class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
+        <x-navigate-back :href="route('members.index')">
             Back to Members
-        </a>
+        </x-navigate-back>
 
         <x-alert />
 
@@ -297,7 +286,7 @@
                                     <p class="font-medium {{ $isActivePT ? 'text-green-600' : 'text-red-600' }}">
                                         {{ \Carbon\Carbon::parse($member->pt_end_date)->format('F j, Y') }}
                                         @if($isActivePT)
-                                            ({{ (int)(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now()) * -1 + 1) }} days remaining)
+                                            ({{(int)(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now()) * -1 + 1) }} days remaining)
                                         @else
                                             (Expired {{ round(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) *-1 }} days ago)
                                         @endif
@@ -378,6 +367,15 @@
                         </a>
                         <a href="#" data-delete-member class="px-4 py-2 text-white rounded-md hover:bg-red-700 bg-red-600 transition-colors">
                             Delete Member
+                        </a>
+                        <a href="{{ route('renew-membership.index', ['renewalType' => 'membership', 'id' => $member->id]) }}" class="px-4 py-2 text-white rounded-md hover:bg-gray-700 bg-black transition-colors">
+                            Renew Membership
+                        </a>
+                        <a href="{{ route('renew-membership.index', ['renewalType' => 'membership_term', 'id' => $member->id]) }}" class="px-4 py-2 text-white rounded-md hover:bg-gray-700 bg-black transition-colors">
+                            Renew Membership Term
+                        </a>
+                        <a href="{{ route('renew-membership.index', ['renewalType' => 'personal_trainer', 'id' => $member->id]) }}" class="px-4 py-2 text-white rounded-md hover:bg-gray-700 bg-black transition-colors">
+                            Renew Personal Trainer
                         </a>
                     </div>
                 </div>

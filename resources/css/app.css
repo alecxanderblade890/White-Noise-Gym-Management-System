@@ -11,12 +11,11 @@
 }
 
 @font-face {
-    font-family: 'Glacial Indifference';
-    src: url('/fonts/GlacialIndifferenceRegular.otf') format('opentype');
+    font-family: "Glacial Indifference";
+    src: url("/resources/fonts/GlacialIndifferenceRegular.otf") format("opentype");
     font-weight: normal;
     font-style: normal;
-    font-display: swap;
-}
+  }
 
 /* Custom CSS for sticky table header */
 tr[onclick] {

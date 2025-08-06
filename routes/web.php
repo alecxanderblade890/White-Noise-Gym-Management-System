@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DailyLogController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\MembershipController;
 
 
 Route::middleware(['guest'])->group(function () {
@@ -28,6 +29,8 @@ Route::middleware(['auth', 'cache.nocache'])->group(function () {
     Route::get('/daily-log-details', [DailyLogController::class, 'getDailyLogDetail'])->name('daily-log-details.show');
     Route::delete('/daily-logs/{id}', [DailyLogController::class, 'deleteDailyLog'])->name('daily-logs.delete');
     Route::post('/daily-logs/update-time-out/{id}', [DailyLogController::class, 'updateTimeOut'])->name('daily-logs.update-time-out');
+    Route::get('/renew-membership/{renewalType}/{id}', [MembershipController::class, 'index'])->name('renew-membership.index');
+    Route::put('/renew-membership/{renewalType}/{id}', [MembershipController::class, 'renewMembership'])->name('renew-membership.update');
 });
 
 Route::middleware(['auth', 'cache.nocache', 'role:admin'])->group(function () {

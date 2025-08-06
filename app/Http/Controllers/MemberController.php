@@ -101,9 +101,14 @@ class MemberController extends Controller
                 $validated['gym_access_start_date'] = now()->toDateString();
                 $validated['gym_access_end_date'] = now()->addMonth()->toDateString();
             }
-            elseif ($validated['membership_term_gym_access'] === '3 months') {
+            else if ($validated['membership_term_gym_access'] === '3 months') {
                 $validated['gym_access_start_date'] = now()->toDateString();
                 $validated['gym_access_end_date'] = now()->addMonths(3)->toDateString();
+            }
+
+            if($validated['with_pt'] === '1 month'){
+                $validated['pt_start_date'] = now()->toDateString();
+                $validated['pt_end_date'] = now()->addMonth()->toDateString();
             }
 
             Member::create([
