@@ -7,17 +7,17 @@
 
         <x-error-message/>
 
-        <x-confirm-modal 
-            modalId="confirmRenewalPTModal"
-            title="Confirm Personal Trainer Renewal"
-            message="Are you sure you want to renew this personal trainer? Please enter staff password to confirm."
-            :routeName="'renew-membership.update'"
-            :itemId="['renewalType' => 'personal_trainer', 'id' => $member->id]"
-        />
-
         <form action="{{ route('renew-membership.update', ['renewalType' => 'personal_trainer', 'id' => $member->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
+
+            <!-- Confirm Renewal Modal placed inside the same form -->
+            <x-confirm-modal 
+                modalId="confirmRenewalPTModal"
+                title="Confirm Personal Trainer Renewal"
+                message="Are you sure you want to renew this personal trainer? Please enter staff password to confirm."
+                :useSameForm="true"
+            />
             <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Personal Trainer Renewal</h2>
                 <div class="flex flex-wrap items-end gap-6 mb-6">
@@ -27,8 +27,8 @@
                             <label for="with_pt" class="block text-sm font-medium text-gray-700 mb-1">With Personal Trainer <span class="text-red-500">*</span></label>
                             <select id="with_pt" name="with_pt" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="None" {{ old('with_pt') == 'None' ? 'selected' : '' }}>None</option>
-                                <option value="1 month" {{ old('with_pt') == '1 month' ? 'selected' : '' }}>1 Month</option>
+                                <option value="None" {{ old('with_pt', $member->with_pt) == 'None' ? 'selected' : '' }}>None</option>
+                                <option value="1 month" {{ old('with_pt', $member->with_pt) == '1 month' ? 'selected' : '' }}>1 Month</option>
                             </select>
                             @error('with_pt')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -75,7 +75,7 @@
                 </div>
                 <div class="flex mt-6">
                     <button type="button" 
-                            onclick="document.getElementById('confirmRenewalPTModal').classList.remove('hidden')" 
+                            onclick="document.getElementById('confirmRenewalPTModal').classList.remove('hidden');" 
                             class="bg-black hover:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors duration-200">
                         Renew Personal Trainer
                     </button>

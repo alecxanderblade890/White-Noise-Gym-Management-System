@@ -7,18 +7,17 @@
 
         <x-error-message/>
 
-        <!-- Confirm Renewal Modal -->
-        <x-confirm-modal 
-            modalId="confirmRenewalModal"
-            title="Confirm Membership Renewal"
-            message="Are you sure you want to renew this membership? Please enter your password to confirm."
-            :routeName="'renew-membership.update'"
-            :itemId="['renewalType' => 'membership', 'id' => $member->id]"
-        />
-
         <form id="renewalForm" action="{{ route('renew-membership.update', ['renewalType' => 'membership', 'id' => $member->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
+
+            <!-- Confirm Renewal Modal placed inside the same form -->
+            <x-confirm-modal 
+                modalId="confirmRenewalModal"
+                title="Confirm Membership Renewal"
+                message="Are you sure you want to renew this membership? Please enter your password to confirm."
+                :useSameForm="true"
+            />
             <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Membership Renewal</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

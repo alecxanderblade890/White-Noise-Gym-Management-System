@@ -182,8 +182,8 @@
                         <label for="member_type" class="block text-sm font-medium text-gray-700 mb-1">Member Type <span class="text-red-500">*</span></label>
                         <select id="member_type" name="member_type" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="student" {{ old('member_type') == 'student' ? 'selected' : '' }}>Student</option>
-                            <option value="regular" {{ old('member_type') == 'regular' ? 'selected' : '' }}>Regular</option>
+                            <option value="Student" {{ old('member_type') == 'Student' ? 'selected' : '' }}>Student</option>
+                            <option value="Regular" {{ old('member_type') == 'Regular' ? 'selected' : '' }}>Regular</option>
                         </select>
                         @error('member_type')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -221,6 +221,9 @@
                     <!-- With PT -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
+                            <input type="hidden" id="pt_start_date" name="pt_start_date" value="">
+                            <input type="hidden" id="pt_end_date" name="pt_end_date" value="">
+                            <input type="hidden" id="current_end_date_pt" name="current_end_date_pt" value="">
                             <label for="with_pt" class="block text-sm font-medium text-gray-700 mb-1">With Personal Trainer <span class="text-red-500">*</span></label>
                             <select id="with_pt" name="with_pt" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">

@@ -3,25 +3,16 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-8">Daily Logs</h1>
 
         <x-alert />
+        <x-edit-daily-log-modal />
 
         <div class="bg-white shadow-md rounded-lg p-6 mb-8">
             <details {{ $errors->any() ? 'open' : '' }}>
                 <summary class="text-xl font-semibold text-gray-700 mb-4 cursor-pointer">Add New Log</summary>
 
-                @if ($errors->any())
-                    <div class="mb-4">
-                        <div class="text-red-600 font-semibold">Please fix the following errors:</div>
-                        <ul class="list-disc list-inside text-red-500">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                <x-error-message/>
     
                 <form action="{{route('add-daily-log')}}" method="POST" class="space-y-6" enctype="multipart/form-data">
                     @csrf
-
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div>
                             <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date<span class="text-red-500">*</span></label>
@@ -56,8 +47,8 @@
                         <div>
                             <label for="payment_method" class="block text-sm font-medium text-gray-700 mb-1">Payment Method<span class="text-red-500">*</span></label>
                             <select id="payment_method" name="payment_method" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="Gcash">Gcash</option>
-                                <option value="Card">Card</option>
+                                <option value="Cash">Cash</option>    
+                                <option value="GCash">GCash</option>
                                 <option value="Bank Transfer">Bank Transfer</option>
                             </select>
                         </div>
@@ -92,13 +83,15 @@
                             @enderror
                         </div>
 
-                        <div>
-                            <label for="upgrade_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Modify Gym Access<span class="text-red-500">*</span></label>
-                            <select id="upgrade_gym_access" name="upgrade_gym_access" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="no" {{ old('upgrade_gym_access') == 'no' ? 'selected' : '' }}>No</option>    
-                                <option value="yes">Yes</option>
-                            </select>
+                        <div class="pt-6">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="upgrade_gym_access" name="upgrade_gym_access" 
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="upgrade_gym_access" class="ml-2 block text-sm text-gray-700">
+                                Upgrade Gym Access
+                            </label>
                         </div>
+                    </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -151,12 +144,6 @@
                                         </div>
                                     @endforeach
                                 </div>
-                                <div class="mt-2">
-                                    <label for="custom_item" class="block text-sm font-medium text-gray-700 mb-1">Custom Item</label>
-                                    <input type="text" id="custom_item" name="custom_item" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                           placeholder="Enter custom item">
-                                </div>
                             </div>
                         </div>
                         
@@ -181,6 +168,9 @@
                 <table class="min-w-full leading-normal">
                     <thead class="bg-gray-200">
                         <tr>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Photo
+                            </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Date
                             </th>
@@ -208,27 +198,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($dailyLogs as $dailyLog)
-                        <tr class="hover:bg-gray-50" onclick="showLogDetailsModal({
-                                id: '{{ $dailyLog->id }}',
-                                date: '{{ \Carbon\Carbon::parse($dailyLog->date)->format('M d, Y') }}',
-                                time_in: '{{ \Carbon\Carbon::parse($dailyLog->time_in)->format('h:i A') }}',
-                                time_out: '{{ $dailyLog->time_out ? \Carbon\Carbon::parse($dailyLog->time_out)->format('h:i A') : 'In Session' }}',
-                                member_id: '{{ $dailyLog->member_id ?? 'Not a Member Anymore' }}',
-                                full_name: '{{ $dailyLog->full_name ?? '' }}',
-                                membership_term_gym_access: '{{ $dailyLog->member->membership_term_gym_access ?? '0' }}',
-                                payment_method: '{{ $dailyLog->payment_method ?? '' }}',
-                                payment_amount: '{{ $dailyLog->payment_amount ?? '' }}',
-                                purpose_of_visit: '{{ $dailyLog->purpose_of_visit }}',
-                                staff_assigned: '{{ $dailyLog->staff_assigned ?? '' }}',
-                                upgrade_gym_access: '{{ $dailyLog->upgrade_gym_access ?? '' }}',
-                                items_bought: [
-                                    @foreach($dailyLog->items_bought as $item)
-                                        '{{ $item }}'{{ !$loop->last ? ',' : '' }}
-                                    @endforeach
-                                ],
-                                notes: '{{ $dailyLog->notes ?? '' }}'
-                            })">
+                        @foreach ($dailyLogsToday as $dailyLog)
+                        <tr class="hover:bg-gray-50 cursor-pointer" 
+                            onclick="openEditDailyLogModal({{ $dailyLog }})">
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <img src="{{$dailyLog->member->photo_url ? $dailyLog->member->photo_url : asset('images/placeholder_profile.png')}}" class="w-12 h-12 rounded-full">
+                            </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 <p class="text-gray-900 whitespace-no-wrap">
                                     {{ \Carbon\Carbon::parse($dailyLog->date)->format('M d, Y') }}
@@ -258,7 +233,7 @@
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 <p class="text-gray-900 whitespace-no-wrap">
-                                    {{ $dailyLog->member_id ?? 'Not a Member Anymore' }}
+                                    {{ $dailyLog->member_id ?? 'N/A' }}
                                 </p>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -284,32 +259,11 @@
                                 </p>
                             </td>
                         </tr>
-                        <!-- Delete Log Modal -->
-                        <x-delete-modal 
-                            modalId="deleteLogModal{{ $dailyLog->id }}"
-                            title="Delete Log"
-                            message="Are you sure you want to delete this log?"
-                            routeName="daily-logs.delete"
-                            :itemId="$dailyLog->id"
-                        />
                         @endforeach
                         
                     </tbody>
                 </table>
-                <div id="logDetailsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
-                    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto p-6 relative">
-                        <button onclick="closeLogDetailsModal()" class="absolute top-6 right-6 text-gray-500 hover:text-gray-700">&times;</button>
-                        <h3 class="text-xl font-semibold mb-4">Log Details</h3>
-                        <div id="logDetailsContent">
-                            
-                        </div>
-                        <button type="button" class="px-2 py-2 mt-5 text-white rounded-md hover:bg-red-700 bg-red-600 transition-colors" id="deleteLogButton">                                    
-                            Delete
-                        </button>
-                    </div>
-                </div>
             </div>
-            
         </div>
     </div>
 </x-layout>

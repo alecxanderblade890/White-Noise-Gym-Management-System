@@ -26,7 +26,8 @@ Route::middleware(['auth', 'cache.nocache'])->group(function () {
     Route::delete('/delete-member/{id}', [MemberController::class, 'deletedMember'])->name('delete-member');
     Route::post('/add-daily-log', [DailyLogController::class, 'addDailyLog'])->name('add-daily-log');
     Route::get('/get-daily-logs', [DailyLogController::class, 'getDailyLogs'])->name('get-daily-logs');
-    Route::get('/daily-log-details', [DailyLogController::class, 'getDailyLogDetail'])->name('daily-log-details.show');
+    Route::get('/daily-log-details/{id}', [DailyLogController::class, 'getDailyLogDetail'])->name('daily-log-details.show');
+    Route::put('/update-daily-log/{id}', [DailyLogController::class, 'updateDailyLog'])->name('update-daily-log');
     Route::delete('/daily-logs/{id}', [DailyLogController::class, 'deleteDailyLog'])->name('daily-logs.delete');
     Route::post('/daily-logs/update-time-out/{id}', [DailyLogController::class, 'updateTimeOut'])->name('daily-logs.update-time-out');
     Route::get('/renew-membership/{renewalType}/{id}', [MembershipController::class, 'index'])->name('renew-membership.index');

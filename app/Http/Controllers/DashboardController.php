@@ -9,35 +9,60 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        // $totalSalesToday = DailyLog::whereDate('date', now())->sum('payment_amount');
+        try {
+            $today = Carbon::now()->toDateString();
+            
+            // Get total sales for today
+            $totalSalesToday = DailyLog::whereDate('date', $today)->sum('payment_amount');
         
-        // // Get the number of days from the request or default to 7
-        // $days = $request->input('days', 7);
-        // $days = min(max(1, (int)$days), 30); // Ensure days is between 1 and 30
-        
-        // // Get memberships expiring within the selected number of days (including today and the end day)
-        // $startDate = Carbon::now()->startOfDay();
-        // $endDate = Carbon::now()->addDays($days)->endOfDay();
-        
-        // $expiringMembers = Member::select('id', 'full_name', 'start_date', 'end_date')
-        //     ->where('end_date', '>=', $startDate)
-        //     ->where('end_date', '<=', $endDate)
-        //     ->orderBy('end_date', 'asc')
-        //     ->get();
+            // Get total sales by payment mode for today
+            $cashTotal = DailyLog::whereDate('date', $today)
+                ->where('payment_method', 'Cash')
+                ->sum('payment_amount');
+                
+            $gcashTotal = DailyLog::whereDate('date', $today)
+                ->where('payment_method', 'GCash')
+                ->sum('payment_amount');
+                
+            $bankTransferTotal = DailyLog::whereDate('date', $today)
+                ->where('payment_method', 'Bank Transfer')
+                ->sum('payment_amount');
+            
+            // Get current date and 7 days from now
+            $now = Carbon::now();
+            $sevenDaysFromNow = $now->copy()->addDays(7);
+            
+            // Get members with active memberships that are expiring in 7 days or less
+            $members = Member::where(function($query) use ($now, $sevenDaysFromNow) {
+                // Check for memberships expiring in the next 7 days
+                $query->where(function($q) use ($now, $sevenDaysFromNow) {
+                    $q->where('membership_end_date', '>=', $now)
+                    ->where('membership_end_date', '<=', $sevenDaysFromNow);
+                })->orWhere(function($q) use ($now, $sevenDaysFromNow) {
+                    $q->where('gym_access_end_date', '>=', $now)
+                    ->where('gym_access_end_date', '<=', $sevenDaysFromNow);
+                })->orWhere(function($q) use ($now, $sevenDaysFromNow) {
+                    $q->where('pt_end_date', '>=', $now)
+                    ->where('pt_end_date', '<=', $sevenDaysFromNow);
+                });
+            })->orderBy('membership_end_date', 'asc')
+            ->get();
 
-        // $expiredMembers = Member::select('id', 'full_name', 'start_date', 'end_date')
-        //     ->whereDate('end_date', '<', now())
-        //     ->orderBy('end_date', 'asc')
-        //     ->get();
-
-        // return view('pages.dashboard', [
-        //     'totalSalesToday' => $totalSalesToday,
-        //     'expiringMembers' => $expiringMembers,
-        //     'selectedDays' => $days,
-        //     'expiredMembers' => $expiredMembers
-        // ]);
-        return view('pages.dashboard');
+            return view('pages.dashboard', [
+                'totalSalesToday'       => $totalSalesToday,
+                'cashTotal'             => $cashTotal,
+                'gcashTotal'            => $gcashTotal,
+                'bankTransferTotal'     => $bankTransferTotal,
+                'members'               => $members,
+                'now'                   => $now,
+                'sevenDaysFromNow'      => $sevenDaysFromNow,
+            ]);
+        } catch (\Exception $e) {
+            return view('pages.dashboard', [
+                'errors'                => $e->getMessage(),
+            ]);
+        }
     }
 }

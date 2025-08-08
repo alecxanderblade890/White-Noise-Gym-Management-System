@@ -46,7 +46,6 @@ class MemberController extends Controller
 
     public function validateMember(Request $request, $memberId = null)
     {
-
         $rules = [
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'full_name' => 'required|string|max:255',
@@ -59,10 +58,11 @@ class MemberController extends Controller
             'id_number' => 'required|numeric',
             'address' => 'required|string|max:255',
             'member_type' => 'required|string|max:100',
-            'membership_term_gym_access' => 'required|string|max:100',
-            'membership_term_billing_rate' => 'required|numeric|min:0',
-            'with_pt' => 'required|string|max:100',
-            'with_pt_billing_rate' => 'required|numeric|min:0',
+            // The following fields are required only when creating a new member.
+            'membership_term_gym_access' => $memberId ? 'sometimes|string|max:100' : 'required|string|max:100',
+            'membership_term_billing_rate' => $memberId ? 'sometimes|numeric|min:0' : 'required|numeric|min:0',
+            'with_pt' => $memberId ? 'sometimes|string|max:100' : 'required|string|max:100',
+            'with_pt_billing_rate' => $memberId ? 'sometimes|numeric|min:0' : 'required|numeric|min:0',
             'gym_access_start_date' => 'nullable|date',
             'gym_access_end_date' => 'nullable|date',
             'pt_start_date' => 'nullable|date',
@@ -72,9 +72,10 @@ class MemberController extends Controller
             'notes' => 'nullable|string|max:500',
         ];
 
+        
+
         if ($memberId) {
             $rules['email'] = 'required|email|max:255|unique:members,email,' . $memberId;
-            
         }
 
         return Validator::make($request->all(), $rules);
@@ -145,27 +146,36 @@ class MemberController extends Controller
     public function updateMember(Request $request, $id)
     {
         $member = Member::findOrFail($id);
+        $staffUser = User::where('username', 'staff_access')->first();
 
-        $validator = $this->validateMember($request, $member->id);
+        if($request->password === $staffUser->password){
+            $validator = $this->validateMember($request, $member->id);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+
+            $validated = $validator->validated();
+
+            if ($request->hasFile('photo')) {
+                $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
+                    'folder' => 'members',
+                ]);
+                $validated['photo_url'] = $result['secure_url'];
+            }
+
+            try {
+                $member->update($validated);
+                return redirect()->route('member-details.show', $member->id)->with('success', 'Member updated successfully!');
+            } catch (ValidationException $e) {
+                return redirect()->back()->withErrors($e->validator)->withInput();
+            }
         }
-
-        $validated = $validator->validated();
-
-        if ($request->hasFile('photo')) {
-            $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
-                'folder' => 'members',
-            ]);
-            $validated['photo_url'] = $result['secure_url'];
+        else if($request->password !== $staffUser->password){
+            return redirect()->back()->with('error', 'Incorrect staff password. Update cancelled.');
         }
-
-        try {
-            $member->update($validated);
-            return redirect()->route('member-details.show', $member->id)->with('success', 'Member updated successfully!');
-        } catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->validator)->withInput();
+        else{
+            return redirect()->back()->with('error', 'Error updating member. Please try again.');
         }
     }
     public function deletedMember(Request $request, $id)

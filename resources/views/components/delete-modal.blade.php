@@ -9,7 +9,7 @@
             @method('DELETE')
             
             <div>
-                <label for="password-{{ $modalId }}" class="block text-sm font-medium text-gray-700">Enter your password to confirm:</label>
+                <label for="password-{{ $modalId }}" class="block text-sm font-medium text-gray-700">Enter admin password to confirm:</label>
                 <input type="password" 
                        id="password-{{ $modalId }}" 
                        name="password" 

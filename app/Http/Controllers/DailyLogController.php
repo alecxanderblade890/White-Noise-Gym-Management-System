@@ -14,18 +14,22 @@ class DailyLogController extends Controller
 
     public function addDailyLog(Request $request)
     {
+        // Convert checkbox value to proper boolean
+        $request->merge([
+            'upgrade_gym_access' => $request->has('upgrade_gym_access')
+        ]);
+
         $validated = $request->validate([
             'date' => 'required|date',
             'time_in' => 'required|date_format:H:i',
             'time_out' => 'nullable|date_format:H:i',
             'member_id' => 'required|integer|exists:members,id',
-            'payment_method' => 'required|in:Gcash,Card,Bank Transfer',
+            'payment_method' => 'required|in:Cash,GCash,Bank Transfer',
             'payment_amount' => 'required|integer|min:0',
             'purpose_of_visit' => 'required|string|max:255',
             'staff_assigned' => 'required|string|max:255',
-            'upgrade_gym_access' => 'required|in:yes,no',
+            'upgrade_gym_access' => 'required|boolean',
             'items' => 'nullable|array',
-            'custom_item' => 'nullable|string|max:255',
             'notes' => 'nullable|string'
         ]);
 
@@ -43,15 +47,10 @@ class DailyLogController extends Controller
                     ->withInput();
             }
 
-            $upgradeGymAccess = $validated['upgrade_gym_access'] === 'yes' ? 1 : 0;
+            $upgradeGymAccess = $validated['upgrade_gym_access'] ? 1 : 0;
 
             $items = $request->input('items', []);
             $tShirts = $request->input('t_shirts', []);
-
-            // Check if a custom item was provided and add it to the items array
-            if ($request->filled('custom_item')) {
-                $items[] = $request->input('custom_item');
-            }
             
             // Combine items and t-shirts into a single array for storage
             $allItems = array_merge($items, $tShirts);
@@ -84,8 +83,16 @@ class DailyLogController extends Controller
     }
     public function getDailyLogs()
     {
-        $dailyLogs = DailyLog::with('member')->get();
-        return view('pages.daily-logs', compact('dailyLogs'));
+        $dailyLogsToday = DailyLog::with('member')->whereDate('date', now()->toDateString())->get();
+        $dailyLogsAll = DailyLog::with('member')->get();
+
+        return view('pages.daily-logs', compact('dailyLogsToday', 'dailyLogsAll'));
+    }
+    public function getDailyLogDetail($id)
+    {
+        $dailyLog = DailyLog::with('member')->findOrFail($id);
+
+        return view('pages.daily-logs', compact('dailyLog'));
     }
 
     public function deleteDailyLog(Request $request, $id)

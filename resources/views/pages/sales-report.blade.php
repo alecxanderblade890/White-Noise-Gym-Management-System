@@ -1,1 +1,3 @@
-sales report
+<x-layout>
+    sales report
+</x-layout>

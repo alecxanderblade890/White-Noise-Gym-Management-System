@@ -7,18 +7,17 @@
 
         <x-error-message/>
 
-        <!-- Confirm Renewal Modal -->
-        <x-confirm-modal 
-            modalId="confirmRenewalTermModal"
-            title="Confirm Membership Term Renewal"
-            message="Are you sure you want to renew this membership term? Please enter staff password to confirm."
-            :routeName="'renew-membership.update'"
-            :itemId="['renewalType' => 'membership_term', 'id' => $member->id]"
-        />
-
         <form action="{{ route('renew-membership.update', ['renewalType' => 'membership_term', 'id' => $member->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
+
+                <!-- Confirm Renewal Modal placed inside the same form -->
+                <x-confirm-modal 
+                    modalId="confirmRenewalTermModal"
+                    title="Confirm Membership Term Renewal"
+                    message="Are you sure you want to renew this membership term? Please enter staff password to confirm."
+                    :useSameForm="true"
+                />
             <div class="bg-white shadow-md rounded-lg p-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Membership Term Renewal</h2>
                 <div class="flex flex-wrap items-end gap-6 mb-6">
@@ -27,11 +26,11 @@
                         <label for="member_type" class="block text-sm font-medium text-gray-700 mb-1">Member Type <span class="text-red-500">*</span></label>
                         <select id="member_type" name="member_type" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="student" {{ (old('member_type', $member->member_type) == 'student') ? 'selected' : '' }}>Student</option>
-                            <option value="regular" {{ (old('member_type', $member->member_type) == 'regular') ? 'selected' : '' }}>Regular</option>
+                            <option value="Student" {{ (old('member_type', $member->member_type) == 'Student') ? 'selected' : '' }}>Student</option>
+                            <option value="Regular" {{ (old('member_type', $member->member_type) == 'Regular') ? 'selected' : '' }}>Regular</option>
                         </select>
                         @error('member_type')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p> 
                         @enderror
                     </div>
                     

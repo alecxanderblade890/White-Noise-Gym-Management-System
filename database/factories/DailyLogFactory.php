@@ -29,6 +29,7 @@ class DailyLogFactory extends Factory
             'purpose_of_visit' => fake()->sentence(),
             'staff_assigned' => fake()->name(),
             'upgrade_gym_access' => fake()->boolean(),
+            'items_bought' => fake()->randomElement(['Pocari Sweat', 'Gatorade Blue', 'Gatorade Red', 'Bottled Water', 'White - Large', 'White - XL', 'Black - Large', 'Black - XL', 'Black - XS', 'Black - Medium']),
             'notes' => fake()->text()
         ];
     }
