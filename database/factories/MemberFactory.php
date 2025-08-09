@@ -22,7 +22,7 @@ class MemberFactory extends Factory
     {
         return [
             'full_name' => fake()->name(),
-            'photo_url' => fake()->imageUrl(200, 200, 'people', true),
+            'photo_url' => 'images/placeholder_profile.png',
             'membership_term_gym_access' => fake()->randomElement(['None', '1 month', '3 months', 'Walk in']),
             'member_type' => fake()->randomElement(['Student', 'Regular']),
             'with_pt' => fake()->randomElement(['None', '1 month']),

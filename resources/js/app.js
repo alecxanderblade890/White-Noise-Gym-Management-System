@@ -106,46 +106,8 @@ function openModal() {
 function closeModal() {
     document.getElementById('editProfileModal').classList.add('hidden');
 }
-function openEditDailyLogModal(dailyLog) {
+function openEditDailyLogModal() {
     document.getElementById('editDailyLogModal').classList.remove('hidden');
-    document.getElementById('date').value = dailyLog.date;
-    document.getElementById('time_in').value = dailyLog.time_in;
-    document.getElementById('time_out').value = dailyLog.time_out ? dailyLog.time_out : '';
-    document.getElementById('member_id').value = dailyLog.member_id ? dailyLog.member_id : 'N/A';
-    document.getElementById('payment_method').value = dailyLog.payment_method;
-    document.getElementById('payment_amount').value = dailyLog.payment_amount;
-    document.getElementById('purpose_of_visit').value = dailyLog.purpose_of_visit;
-    document.getElementById('staff_assigned').value = dailyLog.staff_assigned;
-    document.getElementById('notes').value = dailyLog.notes || '';
-    document.getElementById('upgrade_gym_access').checked = dailyLog.upgrade_gym_access || false;
-
-    // Handle items_bought checkboxes for both items and t_shirts
-    if (dailyLog.items_bought) {
-        try {
-            // Parse items_bought if it's a JSON string, or use as is if it's already an object
-            const itemsBought = typeof dailyLog.items_bought === 'string' 
-                ? JSON.parse(dailyLog.items_bought) 
-                : dailyLog.items_bought;
-
-            // Check regular items
-            const itemCheckboxes = document.querySelectorAll('.item-checkbox');
-            itemCheckboxes.forEach(checkbox => {
-                const itemValue = checkbox.value;
-                checkbox.checked = itemsBought.some(item => item === itemValue);
-            });
-
-            // Check t-shirt checkboxes
-            const tshirtCheckboxes = document.querySelectorAll('.tshirt-checkbox');
-            tshirtCheckboxes.forEach(checkbox => {
-                const tshirtValue = checkbox.value;
-                checkbox.checked = itemsBought.some(item => item === tshirtValue);
-            });
-        } catch (e) {
-            console.error('Error parsing items_bought:', e);
-        }
-    }
-    
-
 }
 function closeEditDailyLogModal() {
     document.getElementById('editDailyLogModal').classList.add('hidden');
@@ -163,6 +125,49 @@ window.openEditDailyLogModal = openEditDailyLogModal;
 window.closeEditDailyLogModal = closeEditDailyLogModal;
 window.openDeleteModal = openDeleteModal;
 window.closeDeleteModal = closeDeleteModal;
+
+// Item prices (you can modify these values as needed)
+const itemPrices = {
+    'Pocari Sweat': 50,
+    'Gatorade Blue': 65,
+    'Gatorade Red': 65,
+    'Bottled Water': 20,
+    'White - Large': 350,
+    'White - XL': 350,
+    'Black - Large': 350,
+    'Black - XL': 350,
+    'Black - XS': 300,
+    'Black - Medium': 300
+};
+
+// Function to calculate and update the total payment amount
+function updatePaymentTotal() {
+    let total = 0;
+    
+    // Calculate total from item checkboxes
+    document.querySelectorAll('input[name="items[]"]:checked').forEach(checkbox => {
+        const itemName = checkbox.value;
+        total += itemPrices[itemName] || 0;
+    });
+    
+    // Calculate total from t-shirt checkboxes
+    document.querySelectorAll('input[name="t_shirts[]"]:checked').forEach(checkbox => {
+        const itemName = checkbox.value;
+        total += itemPrices[itemName] || 0;
+    });
+    
+    // Update the payment amount field
+    document.getElementById('payment_amount').value = total;
+}
+
+// Add event listeners when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add change event listeners to all item and t-shirt checkboxes
+    const checkboxes = document.querySelectorAll('input[name="items[]"], input[name="t_shirts[]"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updatePaymentTotal);
+    });
+});
 
 // Only add event listeners if the elements exist
 const editProfileBtn = document.querySelector('[data-edit-profile]');

@@ -84,16 +84,72 @@ class DailyLogController extends Controller
     public function getDailyLogs()
     {
         $dailyLogsToday = DailyLog::with('member')->whereDate('date', now()->toDateString())->get();
-        $dailyLogsAll = DailyLog::with('member')->get();
+        $dailyLogsAll = DailyLog::with('member')->orderBy('date', 'desc')->get();
+        $start_date = now()->startOfMonth()->toDateString();
+        $end_date = now()->toDateString();
 
-        return view('pages.daily-logs', compact('dailyLogsToday', 'dailyLogsAll'));
+        return view('pages.daily-logs', compact('dailyLogsToday', 'dailyLogsAll', 'start_date', 'end_date'));
     }
-    public function getDailyLogDetail($id)
+
+    public function updateDailyLog(Request $request, $id)
     {
-        $dailyLog = DailyLog::with('member')->findOrFail($id);
+        // Convert checkbox value to proper boolean
+        $request->merge([
+            'upgrade_gym_access' => $request->has('upgrade_gym_access')
+        ]);
 
-        return view('pages.daily-logs', compact('dailyLog'));
-    }
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'time_in' => 'required|date_format:H:i',
+            'time_out' => 'nullable|date_format:H:i',
+            'member_id' => 'required|integer|exists:members,id',
+            'payment_method' => 'required|in:Cash,GCash,Bank Transfer',
+            'payment_amount' => 'required|integer|min:0',
+            'purpose_of_visit' => 'required|string|max:255',
+            'staff_assigned' => 'required|string|max:255',
+            'upgrade_gym_access' => 'required|boolean',
+            'items' => 'nullable|array',
+            'notes' => 'nullable|string'
+        ]);
+
+        try {
+
+            $staffUser = User::where('username', 'staff_access')->first();
+
+            // Verify staff password using Hash::check to compare against hashed password
+            if (!$staffUser || $request->password !== $staffUser->password) {
+                return redirect()->back()->with('error', 'Incorrect staff password. Update cancelled.');
+            }
+
+            // Prepare additional / transformed data that are not part of the validator keys
+            $items = $request->input('items', []);
+            $tShirts = $request->input('t_shirts', []);
+            $allItems = array_values(array_unique(array_merge($items, $tShirts)));
+
+            $dailyLog = DailyLog::findOrFail($id);
+            $dailyLog->update([
+                'date' => $validated['date'],
+                'time_in' => $validated['time_in'],
+                'time_out' => $validated['time_out'] ?? null,
+                'member_id' => $validated['member_id'],
+                'payment_method' => $validated['payment_method'],
+                'payment_amount' => $validated['payment_amount'],
+                'purpose_of_visit' => $validated['purpose_of_visit'],
+                'staff_assigned' => $validated['staff_assigned'],
+                'upgrade_gym_access' => $validated['upgrade_gym_access'] ? 1 : 0,
+                'notes' => $validated['notes'],
+                'items_bought' => $allItems
+            ]);
+
+            session()->flash('success', 'Daily log updated successfully!');
+            return redirect()->route('get-daily-logs')->with('success', 'Daily log updated successfully!');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to update daily log: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }   
 
     public function deleteDailyLog(Request $request, $id)
     {
@@ -132,5 +188,31 @@ class DailyLogController extends Controller
 
         return redirect()->route('get-daily-logs')->with('success', 'Time out updated successfully!');
     }
+
+    public function filterDailyLogs(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after_or_equal:start_date',
+            ]);
+
+            $start_date = $validated['start_date'];
+            $end_date = $validated['end_date'];
+
+            $dailyLogsAll = DailyLog::whereBetween('date', [$start_date, $end_date])
+                ->orderBy('date', 'desc')
+                ->get();
+                
+            // Get today's logs as well
+            $dailyLogsToday = DailyLog::with('member')
+                ->whereDate('date', now()->toDateString())
+                ->get();
+
+            return view('pages.daily-logs', compact('dailyLogsAll', 'dailyLogsToday', 'start_date', 'end_date'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Invalid date range. Please try again.');
+        }
+    }   
 }
 
