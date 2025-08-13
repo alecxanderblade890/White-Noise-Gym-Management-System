@@ -19,17 +19,21 @@ class DailyLogFactory extends Factory
         $member = Member::inRandomOrder()->first();
         
         return [
-            'date' => fake()->dateTimeThisYear(),
+            'date' => fake()->date('Y-m-d', '2025-01-01'), // Start date to now
             'time_in' => fake()->time(),
             'time_out' => fake()->time(),
             'member_id' => $member->id,
             'full_name' => $member->full_name,
-            'payment_method' => fake()->randomElement(['Cash', 'GCash', 'Bank Transfer']),
+            'payment_method' => fake()->randomElement(['None', 'Cash', 'GCash', 'Bank Transfer']),
             'payment_amount' => fake()->randomFloat(2, 100, 1000), // Random amount between 100 and 1000
-            'purpose_of_visit' => fake()->sentence(),
+            'purpose_of_visit' => fake()->randomElement(['Membership', 'Membership Term', 'Personal Trainer', 'Gym Use', 'Gym Use & Membership', 'Gym Use & Membership Term', 'Gym Use & Personal Trainer']),
             'staff_assigned' => fake()->name(),
             'upgrade_gym_access' => fake()->boolean(),
-            'items_bought' => fake()->randomElement(['Pocari Sweat', 'Gatorade Blue', 'Gatorade Red', 'Bottled Water', 'White - Large', 'White - XL', 'Black - Large', 'Black - XL', 'Black - XS', 'Black - Medium']),
+            'items_bought' => [
+                'Pocari Sweat',
+                'Bottled Water',
+                'Black - Large',
+            ],
             'notes' => fake()->text()
         ];
     }

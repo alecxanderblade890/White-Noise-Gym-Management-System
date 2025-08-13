@@ -2,14 +2,14 @@
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-8">Daily Logs</h1>
 
-        <x-alert />
+        <x-alert/>
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6 border-b border-gray-200 flex justify-between items-center">
                 <h2 class="text-xl font-semibold text-gray-700">Daily Log List</h2>
                 
                 <!-- Date Range Filter -->
-                <form action="{{ route('daily-logs.filter') }}" method="GET" class="flex items-end space-x-4">
+                <form id="filter-form" action="{{ route('daily-logs.filter') }}" method="GET" class="flex items-end space-x-4">
                     <div class="flex items-center space-x-2">
                         <div>
                             <label for="start_date" class="block text-xs font-medium text-gray-500 mb-1">Start Date</label>
@@ -24,7 +24,13 @@
                         </div>
                     </div>
                     <div class="flex space-x-2">
-                        <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-black/80">
+                        <button type="submit" 
+                                id="filter-btn"
+                                class="inline-flex items-center justify-center ml-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/80">
+                            <svg id="filter-spinner" class="hidden -ml-1 mr-2 h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
                             Filter
                         </button>
                     </div>
@@ -64,10 +70,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($dailyLogsAll as $dailyLog)
+                        @foreach ($dailyLogs as $dailyLog)
                             <tr class="hover:bg-gray-50 cursor-pointer" 
-                                onclick="openEditDailyLogModal({{ $dailyLog }})">
-                                <x-edit-daily-log-modal :dailyLog="$dailyLog"/>
+                                onclick="openEditDailyLogModal({{ $dailyLog->id }})">
+                                <x-modals.edit-daily-log-modal :dailyLog="$dailyLog"/>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                     <img src="{{$dailyLog->member->photo_url ? $dailyLog->member->photo_url : asset('images/placeholder_profile.png')}}" class="w-12 h-12 rounded-full">
                                 </td>
@@ -131,7 +137,11 @@
                 </table>
             </div>
         </div>
+        <div class="px-6 py-4">
+            {{ $dailyLogs->onEachSide(1)->links('pagination::tailwind') }}
+        </div>
     </div>
+    @push('scripts')
+        @vite(['resources/js/components/modals.js', 'resources/js/components/dailyLogs.js'])
+    @endpush
 </x-layout>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>

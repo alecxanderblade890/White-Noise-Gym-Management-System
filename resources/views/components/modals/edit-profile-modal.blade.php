@@ -1,16 +1,16 @@
  <!-- Edit Profile Modal -->
  <div id="editProfileModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-4 md:p-8 relative overflow-y-auto" style="max-height:90vh;">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Member Profile</h2>
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-4 md:p-8 relative overflow-y-auto" style="max-height:90vh;">
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Member Profile</h2>
 
-            <x-error-message/>
+        <x-alert/>
 
             <form action="{{ route('update-member', $member->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
-                <x-confirm-modal 
+                <x-modals.confirm-modal 
                     modalId="confirmEditProfileModal"
                     title="Confirm Edit Profile"
                     message="Are you sure you want to apply changes to this profile? Please enter password to confirm."

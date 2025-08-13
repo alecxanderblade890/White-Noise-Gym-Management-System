@@ -5,14 +5,14 @@
         </x-navigate-back>
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Renew Membership Term for {{ $member->full_name }}</h1>
 
-        <x-error-message/>
+        <x-alert/>
 
         <form action="{{ route('renew-membership.update', ['renewalType' => 'membership_term', 'id' => $member->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 
                 <!-- Confirm Renewal Modal placed inside the same form -->
-                <x-confirm-modal 
+                <x-modals.confirm-modal 
                     modalId="confirmRenewalTermModal"
                     title="Confirm Membership Term Renewal"
                     message="Are you sure you want to renew this membership term? Please enter staff password to confirm."
@@ -97,4 +97,7 @@
             </div>
         </form>
     </div>
+    @push('scripts')
+        @vite('resources/js/components/registration.js')
+    @endpush
 </x-layout>

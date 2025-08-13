@@ -23,7 +23,7 @@ class DailyLogController extends Controller
             'date' => 'required|date',
             'time_in' => 'required|date_format:H:i',
             'time_out' => 'nullable|date_format:H:i',
-            'member_id' => 'required|integer|exists:members,id',
+            'form_member_id' => 'required|integer|exists:members,id',
             'payment_method' => 'required|in:Cash,GCash,Bank Transfer',
             'payment_amount' => 'required|integer|min:0',
             'purpose_of_visit' => 'required|string|max:255',
@@ -31,19 +31,25 @@ class DailyLogController extends Controller
             'upgrade_gym_access' => 'required|boolean',
             'items' => 'nullable|array',
             'notes' => 'nullable|string'
-        ]);
+        ]); 
 
         try {
             // Get the member first
-            $member = Member::findOrFail($validated['member_id']);
+            $member = Member::findOrFail($validated['form_member_id']);
 
             // Check if member's gym access has expired
             $today = now()->startOfDay();
             $gymAccessEndDate = $member->gym_access_end_date ? \Carbon\Carbon::parse($member->gym_access_end_date)->startOfDay() : null;
+            $membershipEndDate = $member->membership_end_date ? \Carbon\Carbon::parse($member->membership_end_date)->startOfDay() : null;
             
             if (!$gymAccessEndDate || $today->gt($gymAccessEndDate)) {
                 return redirect()->back()
-                    ->withErrors(['member_id' => "This member's gym access term has expired. Please renew their gym access term."])
+                    ->with('error', "This member's gym access term has expired. Please renew to proceed.")
+                    ->withInput();
+            }
+            else if (!$membershipEndDate || $today->gt($membershipEndDate)) {
+                return redirect()->back()
+                    ->with('error', "This member's membership has expired. Please renew to proceed.")
                     ->withInput();
             }
 
@@ -62,7 +68,7 @@ class DailyLogController extends Controller
                 'date' => $validated['date'],
                 'time_in' => $validated['time_in'],
                 'time_out' => $validated['time_out'] ?? null,
-                'member_id' => $validated['member_id'],
+                'member_id' => $validated['form_member_id'],
                 'full_name' => $member->full_name,
                 'payment_method' => $validated['payment_method'],
                 'payment_amount' => $validated['payment_amount'],
@@ -73,23 +79,46 @@ class DailyLogController extends Controller
                 'items_bought' => $allItems
             ]);
             
-            session()->flash('success', 'Daily Log added successfully!');
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['error' => 'Failed to add daily log: ' . $e->getMessage()])
-                ->withInput();
+            return redirect()->back()->with('error', 'Failed to add daily log: ' . $e->getMessage());
         }
-        return redirect()->route('get-daily-logs')->with('success', 'Log added successfully!');
+        return redirect()->route('get-daily-logs')->with('success', 'Daily log added successfully!');
     }
     public function getDailyLogs()
     {
-        $dailyLogsToday = DailyLog::with('member')->whereDate('date', now()->toDateString())->get();
-        $dailyLogsAll = DailyLog::with('member')->orderBy('date', 'desc')->get();
-        $start_date = now()->startOfMonth()->toDateString();
+        $start_date = now()->toDateString();
         $end_date = now()->toDateString();
-
-        return view('pages.daily-logs', compact('dailyLogsToday', 'dailyLogsAll', 'start_date', 'end_date'));
+        
+        $dailyLogs = DailyLog::with('member')
+            ->whereDate('date', $start_date)
+            ->orderBy('time_in', 'desc')
+            ->paginate(10);
+    
+        return view('pages.daily-logs', compact('dailyLogs', 'start_date', 'end_date'));
     }
+    
+    public function filterDailyLogs(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after_or_equal:start_date',
+            ]);
+
+            $start_date = $validated['start_date'];
+            $end_date = $validated['end_date'];
+
+            $dailyLogs = DailyLog::with('member')
+                ->whereBetween('date', [$start_date, $end_date])
+                ->orderBy('date', 'desc')
+                ->orderBy('time_in', 'desc')
+                ->paginate(10);
+
+            return view('pages.daily-logs', compact('dailyLogs', 'start_date', 'end_date'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Invalid date range. Please try again.');
+        }
+    }  
 
     public function updateDailyLog(Request $request, $id)
     {
@@ -102,7 +131,7 @@ class DailyLogController extends Controller
             'date' => 'required|date',
             'time_in' => 'required|date_format:H:i',
             'time_out' => 'nullable|date_format:H:i',
-            'member_id' => 'required|integer|exists:members,id',
+            'form_member_id' => 'required|integer|exists:members,id',
             'payment_method' => 'required|in:Cash,GCash,Bank Transfer',
             'payment_amount' => 'required|integer|min:0',
             'purpose_of_visit' => 'required|string|max:255',
@@ -131,7 +160,7 @@ class DailyLogController extends Controller
                 'date' => $validated['date'],
                 'time_in' => $validated['time_in'],
                 'time_out' => $validated['time_out'] ?? null,
-                'member_id' => $validated['member_id'],
+                'member_id' => $validated['form_member_id'],
                 'payment_method' => $validated['payment_method'],
                 'payment_amount' => $validated['payment_amount'],
                 'purpose_of_visit' => $validated['purpose_of_visit'],
@@ -141,13 +170,11 @@ class DailyLogController extends Controller
                 'items_bought' => $allItems
             ]);
 
-            session()->flash('success', 'Daily log updated successfully!');
+            // session()->flash('success', 'Daily log updated successfully!');
             return redirect()->route('get-daily-logs')->with('success', 'Daily log updated successfully!');
             
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['error' => 'Failed to update daily log: ' . $e->getMessage()])
-                ->withInput();
+            return redirect()->back()->with('error', 'Failed to update daily log: ' . $e->getMessage());
         }
     }   
 
@@ -188,31 +215,5 @@ class DailyLogController extends Controller
 
         return redirect()->route('get-daily-logs')->with('success', 'Time out updated successfully!');
     }
-
-    public function filterDailyLogs(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'start_date' => 'required|date',
-                'end_date' => 'required|date|after_or_equal:start_date',
-            ]);
-
-            $start_date = $validated['start_date'];
-            $end_date = $validated['end_date'];
-
-            $dailyLogsAll = DailyLog::whereBetween('date', [$start_date, $end_date])
-                ->orderBy('date', 'desc')
-                ->get();
-                
-            // Get today's logs as well
-            $dailyLogsToday = DailyLog::with('member')
-                ->whereDate('date', now()->toDateString())
-                ->get();
-
-            return view('pages.daily-logs', compact('dailyLogsAll', 'dailyLogsToday', 'start_date', 'end_date'));
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Invalid date range. Please try again.');
-        }
-    }   
 }
 

@@ -24,6 +24,8 @@ Route::middleware(['auth', 'cache.nocache'])->group(function () {
     Route::post('/add-member', [MemberController::class, 'addMember'])->name('add-member');
     Route::put('/update-member/{id}', [MemberController::class, 'updateMember'])->name('update-member');
     Route::delete('/delete-member/{id}', [MemberController::class, 'deletedMember'])->name('delete-member');
+    Route::get('/search-member', [MemberController::class, 'searchMember'])->name('member.search');
+    Route::get('/validate-member-id/{id}', [MemberController::class, 'validateMemberId'])->name('validate-member-id');
     Route::post('/add-daily-log', [DailyLogController::class, 'addDailyLog'])->name('add-daily-log');
     Route::get('/get-daily-logs', [DailyLogController::class, 'getDailyLogs'])->name('get-daily-logs');
     Route::put('/update-daily-log/{id}', [DailyLogController::class, 'updateDailyLog'])->name('daily-log.update');

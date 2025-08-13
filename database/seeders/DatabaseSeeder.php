@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             'password' => 'qwerty789',
             'role' => 'admin',
         ]);
-        Member::factory(300)->create();
-        DailyLog::factory(100)->create();
+        // Member::factory(300)->create();
+        // DailyLog::factory(25)->create();
     }
 }

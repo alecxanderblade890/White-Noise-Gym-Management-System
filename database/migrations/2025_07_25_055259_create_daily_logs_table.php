@@ -18,10 +18,10 @@ return new class extends Migration
             $table->time('time_out')->nullable();
             $table->foreignId('member_id')->nullable()->constrained()->onDelete('set null');
             $table->string('full_name');
-            $table->string('payment_method');
+            $table->enum('payment_method', ['None', 'Cash', 'GCash', 'Bank Transfer']);
             $table->unsignedInteger('payment_amount');
             $table->json('items_bought')->nullable();
-            $table->string('purpose_of_visit');
+            $table->enum('purpose_of_visit', ['Membership', 'Membership Term', 'Personal Trainer', 'Gym Use', 'Gym Use & Membership', 'Gym Use & Membership Term', 'Gym Use & Personal Trainer']);
             $table->string('staff_assigned');
             $table->boolean('upgrade_gym_access'); 
             $table->text('notes')->nullable(); 

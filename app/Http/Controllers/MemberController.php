@@ -9,6 +9,9 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\DailyLog;
+use App\Models\SalesReport;
+use Carbon\Carbon;
 
 class MemberController extends Controller
 {
@@ -24,6 +27,7 @@ class MemberController extends Controller
             ],
         ]);
     }
+    
     public function showManageMembers()
     {
         return view('pages.manage-members');
@@ -42,6 +46,27 @@ class MemberController extends Controller
     public function registerMemberForm()
     {
         return view('pages.create-member');
+    }
+    public function validateMemberId($id)
+    {
+        $member = Member::where('id', $id)->first();
+
+        if (!$member) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Member ID is invalid',
+                'member_id' => null
+            ]);
+        }
+    
+        return response()->json([
+            'success' => true,
+            'error' => null,
+            'member_id' => $member->id,
+            'member_type' => $member->member_type,
+            'membership_term_gym_access' => $member->membership_term_gym_access,
+            'with_pt' => $member->with_pt
+        ]);
     }
 
     public function validateMember(Request $request, $memberId = null)
@@ -89,9 +114,6 @@ class MemberController extends Controller
         }
 
         $validated = $validator->validated();
-
-
-
         $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
             'folder' => 'members',
         ]);
@@ -138,6 +160,9 @@ class MemberController extends Controller
                 'emergency_contact_number' => $validated['emergency_contact_number'],
                 'notes' => $validated['notes'] ?? null,
             ]);
+
+            $this->salesReportEntry(now()->toDateString(), $validated);
+
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->validator)->withInput();
         }
@@ -199,5 +224,57 @@ class MemberController extends Controller
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->validator)->withInput();
         }
+    }
+    public function searchMember(Request $request)
+    {
+        $query = Member::query();
+        
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'LIKE', "%{$search}%")
+                  ->orWhere('full_name', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        $members = $query->orderBy('id', 'desc')->get();
+        
+        // If it's an AJAX request (for future implementation)
+        if ($request->ajax()) {
+            return response()->json($members);
+        }
+        
+        return view('pages.members', compact('members'));
+    }
+    public function salesReportEntry($date, $request)
+    {
+        $salesReport = SalesReport::where('date', $date)->first();
+        
+        if($salesReport){
+            //update
+        }
+        else{
+
+            SalesReport::create([
+                'date' => $date,
+                'memberships_only' => 1,
+                'walk_in_regular_on_sign_up' => 0,
+                'walk_in_student_on_sign_up' => 0,
+                'personal_trainer_on_sign_up' => 0,
+                '1_month_regular' => 0,
+                '1_month_student' => 0,
+                '3_months_regular' => 0,
+                '3_months_student' => 0,
+                'walk_in_regular' => 0,
+                'walk_in_student' => 0,
+                'gym_access_1_month_regular' => 0,
+                'gym_access_1_month_student' => 0,
+                'gym_access_3_months_regular' => 0,
+                'gym_access_3_months_student' => 0,
+                'personal_trainer_1_month' => 0,
+                'personal_trainer_walk_in' => 0,
+                'total_sales' => 0,
+            ]);
+        }        
     }
 }

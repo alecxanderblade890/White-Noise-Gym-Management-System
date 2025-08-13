@@ -1,8 +1,8 @@
 <x-layout>
     <!-- Edit Profile Modal -->
-    <x-edit-profile-modal :member="$member"/>
+    <x-modals.edit-profile-modal :member="$member"/>
     <!-- Delete Member Modal -->
-    <x-delete-modal 
+    <x-modals.delete-modal 
         modalId="deleteMemberModal"
         title="Delete Member"
         message="Are you sure you want to delete this member?"
@@ -14,10 +14,7 @@
         <x-navigate-back :href="route('members.index')">
             Back to Members
         </x-navigate-back>
-
-        <x-alert />
-        <x-error-message/>
-
+        <x-alert/>
         <!-- Profile Card -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
             <div class="md:flex">
@@ -247,4 +244,7 @@
             </div>
         </div>
     </div>
+    @push('scripts')
+        @vite('resources/js/components/modals.js')
+    @endpush
 </x-layout>

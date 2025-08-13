@@ -5,14 +5,14 @@
         </x-navigate-back>
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Renew Personal Trainer for {{ $member->full_name }}</h1>
 
-        <x-error-message/>
+        <x-alert/>
 
         <form action="{{ route('renew-membership.update', ['renewalType' => 'personal_trainer', 'id' => $member->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 
             <!-- Confirm Renewal Modal placed inside the same form -->
-            <x-confirm-modal 
+            <x-modals.confirm-modal 
                 modalId="confirmRenewalPTModal"
                 title="Confirm Personal Trainer Renewal"
                 message="Are you sure you want to renew this personal trainer? Please enter staff password to confirm."
