@@ -132,7 +132,7 @@ class DailyLogController extends Controller
             'time_in' => 'required|date_format:H:i',
             'time_out' => 'nullable|date_format:H:i',
             'form_member_id' => 'required|integer|exists:members,id',
-            'payment_method' => 'required|in:Cash,GCash,Bank Transfer',
+            'payment_method' => 'required|in:None,Cash,GCash,Bank Transfer',
             'payment_amount' => 'required|integer|min:0',
             'purpose_of_visit' => 'required|string|max:255',
             'staff_assigned' => 'required|string|max:255',

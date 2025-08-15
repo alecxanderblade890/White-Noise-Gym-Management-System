@@ -15,7 +15,7 @@ WORKDIR /var/www/html
 # -----------------------------
 # 1. Copy composer files + .env first for package discovery
 # -----------------------------
-COPY composer.json composer.lock .env ./
+COPY composer.json composer.lock ./
 
 # Install PHP dependencies, skip scripts to avoid errors
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
@@ -25,14 +25,13 @@ RUN composer install --no-interaction --optimize-autoloader --no-scripts
 # -----------------------------
 COPY package.json package-lock.json vite.config.js ./
 
-# Install Node dependencies
-RUN npm install
-
 # -----------------------------
 # 3. Copy the rest of the Laravel app
 # -----------------------------
 COPY . .
 
+# Install Node dependencies
+RUN npm install
 # -----------------------------
 # 4. Build Vite assets (now all files exist)
 # -----------------------------

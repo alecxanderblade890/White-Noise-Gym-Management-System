@@ -39,6 +39,10 @@ services:
       DB_DATABASE: laravel
       DB_USERNAME: Whitenoisegym
       DB_PASSWORD: Blade890@
+      CLOUDINARY_URL: cloudinary://395673266618914:QAEtxszJ3XxsG0JZltnX71U42TQ@dq10qlo0n
+      CLOUDINARY_API_KEY: 395673266618914
+      CLOUDINARY_API_SECRET: QAEtxszJ3XxsG0JZltnX71U42TQ
+      CLOUDINARY_CLOUD_NAME: dq10qlo0n
     working_dir: /var/www/html
     volumes:
       # Only mount folders that need persistence, NOT public/build
@@ -46,7 +50,6 @@ services:
       - ./bootstrap:/var/www/html/bootstrap
       - ./config:/var/www/html/config
       - ./database:/var/www/html/database
-      - ./.env:/var/www/html/.env 
       - ./resources:/var/www/html/resources
       - ./routes:/var/www/html/routes
       - ./composer.json:/var/www/html/composer.json
