@@ -17,10 +17,10 @@ php artisan config:cache
 php artisan route:cache
 
 # Run migrations and seed only on first run
-if [ ! -f "/var/www/first-run-complete" ]; then
+if [ ! -f "/var/www/html/first-run-complete" ]; then
     echo "First run detected - running migrations and seeding..."
     php artisan migrate:fresh --seed --force
-    touch /var/www/first-run-complete
+    touch /var/www/html/first-run-complete
     echo "Migrations and seeding completed successfully"
 fi
 
