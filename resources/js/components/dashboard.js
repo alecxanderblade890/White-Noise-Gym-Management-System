@@ -21,11 +21,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Existing Validate Member button handler
-    document.getElementById('validate-member-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        const memberId = document.getElementById('member_id').value;
-        const labelText = document.getElementById('label_text');
-        const spinner = document.getElementById('validate-member-spinner');
+    const validateMemberBtn = document.getElementById('validate-member-btn');
+    if (validateMemberBtn) {
+        validateMemberBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const memberId = document.getElementById('member_id').value;
+            const labelText = document.getElementById('label_text');
+            const spinner = document.getElementById('validate-member-spinner');
         
         if (memberId) {
             spinner.classList.remove('hidden');
@@ -65,9 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Error:', error);
                     spinner.classList.add('hidden');
                 });
-        }
-    });
-    
+            }
+        });
+    }
     // Add change event listeners to all item and t-shirt checkboxes
     const checkboxes = document.querySelectorAll('input[name="items[]"], input[name="t_shirts[]"]');
     checkboxes.forEach(checkbox => {

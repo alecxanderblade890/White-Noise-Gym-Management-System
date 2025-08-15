@@ -17,6 +17,7 @@ class MembershipController extends Controller
 
     public function renewMembership(Request $request, $renewalType, $id)
     {
+        $suffix = '';
         $request->validate([
             'password' => 'required|string'
         ]);
@@ -33,6 +34,7 @@ class MembershipController extends Controller
                         'membership_start_date' => $request->membership_start_date,
                         'membership_end_date' => $request->membership_end_date,
                     ]);
+                    $suffix = 'membership';
                 }
                 else if($renewalType == 'membership_term'){
                     $gym_access_start_date = now()->toDateString();
@@ -54,6 +56,7 @@ class MembershipController extends Controller
                         'gym_access_start_date' => $gym_access_start_date,
                         'gym_access_end_date' => $gym_access_end_date,
                     ]);
+                    $suffix = 'membership term';
                 }
                 else if($renewalType == 'personal_trainer'){
                     $member->update([
@@ -61,13 +64,14 @@ class MembershipController extends Controller
                         'pt_start_date' => $request->pt_start_date ? Carbon::parse($request->pt_start_date)->toDateString() : null,
                         'pt_end_date' => $request->pt_end_date ? Carbon::parse($request->pt_end_date)->toDateString() : null,
                     ]);
+                    $suffix = 'personal trainer';
                 }
             }
             else{
                 return redirect()->route('member-details.show', $member->id)->with('error', 'Incorrect staff password. Renewal cancelled.');
             }            
 
-            return redirect()->route('member-details.show', $member->id)->with('success', 'Member membership renewed successfully');
+            return redirect()->route('member-details.show', $member->id)->with('success', 'Member ' . $suffix . ' renewed successfully');
             
         } catch (\Throwable $th) {
             return redirect()->route('member-details.show', $member->id)->with('error', $th->getMessage());

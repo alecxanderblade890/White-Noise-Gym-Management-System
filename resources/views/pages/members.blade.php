@@ -121,4 +121,5 @@
         </div>
     @endif
 </div>
+{{ $members->onEachSide(1)->links('pagination::tailwind') }}
 </x-layout>

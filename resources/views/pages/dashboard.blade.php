@@ -91,6 +91,7 @@
                                 <div>
                                     <label for="payment_method" class="block text-sm font-medium text-gray-700 mb-1">Payment Method<span class="text-red-500">*</span></label>
                                     <select id="payment_method" name="payment_method" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black">
+                                        <option value="None">None</option>
                                         <option value="Cash">Cash</option>    
                                         <option value="GCash">GCash</option>
                                         <option value="Bank Transfer">Bank Transfer</option>
@@ -113,9 +114,9 @@
                                         <option value="Membership Term">Membership Term</option>
                                         <option value="Personal Trainer">Personal Trainer</option>
                                         <option value="Gym Use">Gym Use</option>
-                                        <option value="Gym Use & Membership">Gym Use & Membership</option>
-                                        <option value="Gym Use & Membership Term">Gym Use & Membership Term</option>
-                                        <option value="Gym Use & Personal Trainer">Gym Use & Personal Trainer</option>
+                                        <option value="Gym Use & Membership Payment">Gym Use & Membership Payment</option>
+                                        <option value="Gym Use & Membership Term Payment">Gym Use & Membership Term Payment</option>
+                                        <option value="Gym Use & Personal Trainer Payment">Gym Use & Personal Trainer Payment</option>
                                     </select>
                                     @error('purpose_of_visit')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -348,7 +349,4 @@
             </div>
         </div>
     </div>
-    @push('scripts')
-        @vite('resources/js/components/dashboard.js')
-    @endpush
 </x-layout>

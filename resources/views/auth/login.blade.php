@@ -42,5 +42,4 @@
             </form>
         </div>
     </div>
-    </div>
 </x-auth-layout>

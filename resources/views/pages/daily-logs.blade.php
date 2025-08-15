@@ -138,10 +138,10 @@
             </div>
         </div>
         <div class="px-6 py-4">
-            {{ $dailyLogs->onEachSide(1)->links('pagination::tailwind') }}
+            {{ $dailyLogs->appends([
+                'start_date' => request('start_date'),
+                'end_date' => request('end_date')
+            ])->onEachSide(1)->links('pagination::tailwind') }}
         </div>
     </div>
-    @push('scripts')
-        @vite(['resources/js/components/modals.js', 'resources/js/components/dailyLogs.js'])
-    @endpush
 </x-layout>

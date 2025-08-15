@@ -28,6 +28,6 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
         // Member::factory(300)->create();
-        // DailyLog::factory(25)->create();
+        // DailyLog::factory(100)->create();
     }
 }

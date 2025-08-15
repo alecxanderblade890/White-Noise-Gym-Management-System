@@ -347,7 +347,4 @@
             </div>
         </form>
     </div>
-@push('scripts')
-    @vite('resources/js/components/registration.js')
-@endpush
 </x-layout>

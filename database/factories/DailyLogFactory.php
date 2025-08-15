@@ -26,7 +26,7 @@ class DailyLogFactory extends Factory
             'full_name' => $member->full_name,
             'payment_method' => fake()->randomElement(['None', 'Cash', 'GCash', 'Bank Transfer']),
             'payment_amount' => fake()->randomFloat(2, 100, 1000), // Random amount between 100 and 1000
-            'purpose_of_visit' => fake()->randomElement(['Membership', 'Membership Term', 'Personal Trainer', 'Gym Use', 'Gym Use & Membership', 'Gym Use & Membership Term', 'Gym Use & Personal Trainer']),
+            'purpose_of_visit' => fake()->randomElement(['Membership', 'Membership Term', 'Personal Trainer', 'Gym Use', 'Gym Use & Membership Payment', 'Gym Use & Membership Term Payment', 'Gym Use & Personal Trainer Payment']),
             'staff_assigned' => fake()->name(),
             'upgrade_gym_access' => fake()->boolean(),
             'items_bought' => [

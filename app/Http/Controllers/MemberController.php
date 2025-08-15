@@ -35,7 +35,7 @@ class MemberController extends Controller
 
     public function getMembers()
     {
-        $members = Member::all();
+        $members = Member::orderBy('id', 'desc')->paginate(10);
         return view('pages.members', compact('members'));
     }
     public function showMemberDetails($id)
@@ -161,8 +161,6 @@ class MemberController extends Controller
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            $this->salesReportEntry(now()->toDateString(), $validated);
-
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->validator)->withInput();
         }
@@ -237,14 +235,14 @@ class MemberController extends Controller
             });
         }
         
-        $members = $query->orderBy('id', 'desc')->get();
-        
-        // If it's an AJAX request (for future implementation)
-        if ($request->ajax()) {
-            return response()->json($members);
-        }
-        
-        return view('pages.members', compact('members'));
+        $members = $query->orderBy('id', 'desc')->paginate(10);
+    
+    // If it's an AJAX request (for future implementation)
+    if ($request->ajax()) {
+        return response()->json($members);
+    }
+    
+    return view('pages.members', compact('members'));
     }
     public function salesReportEntry($date, $request)
     {

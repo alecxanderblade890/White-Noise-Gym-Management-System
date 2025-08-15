@@ -244,7 +244,4 @@
             </div>
         </div>
     </div>
-    @push('scripts')
-        @vite('resources/js/components/modals.js')
-    @endpush
 </x-layout>

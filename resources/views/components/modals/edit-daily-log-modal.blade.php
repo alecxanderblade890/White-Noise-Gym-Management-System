@@ -11,7 +11,7 @@
             @method('PUT')
 
             <x-modals.confirm-modal 
-                :modalId="'confirmEditDailyLogModal'"
+                :modalId="'confirmEditDailyLogModal-' . $dailyLog->id"
                 title="Confirm Edit Daily Log"
                 message="Are you sure you want to apply changes to this daily log? Please enter password to confirm."
                 :useSameForm="true"
@@ -55,6 +55,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
                         <select id="payment_method" name="payment_method" 
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                            <option value="None" {{ $dailyLog->payment_method === 'None' ? 'selected' : '' }}>None</option>
                             <option value="Cash" {{ $dailyLog->payment_method === 'Cash' ? 'selected' : '' }}>Cash</option>    
                             <option value="GCash" {{ $dailyLog->payment_method === 'GCash' ? 'selected' : '' }}>GCash</option>
                             <option value="Bank Transfer" {{ $dailyLog->payment_method === 'Bank Transfer' ? 'selected' : '' }}>Bank Transfer</option>
@@ -86,9 +87,9 @@
                             <option value="Membership Term" {{ $dailyLog->purpose_of_visit === 'Membership Term' ? 'selected' : '' }}>Membership Term</option>    
                             <option value="Personal Trainer" {{ $dailyLog->purpose_of_visit === 'Personal Trainer' ? 'selected' : '' }}>Personal Trainer</option>   
                             <option value="Gym Use" {{ $dailyLog->purpose_of_visit === 'Gym Use' ? 'selected' : '' }}>Gym Use</option>     
-                            <option value="Gym Use & Membership" {{ $dailyLog->purpose_of_visit === 'Gym Use & Membership' ? 'selected' : '' }}>Gym Use & Membership</option>    
-                            <option value="Gym Use & Membership Term" {{ $dailyLog->purpose_of_visit === 'Gym Use & Membership Term' ? 'selected' : '' }}>Gym Use & Membership Term</option>    
-                            <option value="Gym Use & Personal Trainer" {{ $dailyLog->purpose_of_visit === 'Gym Use & Personal Trainer' ? 'selected' : '' }}>Gym Use & Personal Trainer</option>    
+                            <option value="Gym Use & Membership Payment" {{ $dailyLog->purpose_of_visit === 'Gym Use & Membership Payment' ? 'selected' : '' }}>Gym Use & Membership Payment</option>    
+                            <option value="Gym Use & Membership Term Payment" {{ $dailyLog->purpose_of_visit === 'Gym Use & Membership Term Payment' ? 'selected' : '' }}>Gym Use & Membership Term Payment</option>    
+                            <option value="Gym Use & Personal Trainer Payment" {{ $dailyLog->purpose_of_visit === 'Gym Use & Personal Trainer Payment' ? 'selected' : '' }}>Gym Use & Personal Trainer Payment</option>    
                         </select>
                         @error('purpose_of_visit')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -175,7 +176,7 @@
                         class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50">
                     Cancel
                 </button>
-                <button type="button" onclick="document.getElementById('confirmEditDailyLogModal').classList.remove('hidden')" class="px-4 py-2 rounded-md text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/80">Save Changes</button>
+                <button type="button" onclick="document.getElementById('confirmEditDailyLogModal-{{ $dailyLog->id }}').classList.remove('hidden')" class="px-4 py-2 rounded-md text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/80">Save Changes</button>
                 <button type="button" onclick="document.getElementById('confirmDeleteDailyLogModal-{{ $dailyLog->id }}').classList.remove('hidden')" class="px-4 py-2 rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Delete Log</button>
             </div>
         </form>

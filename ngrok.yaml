@@ -1,0 +1,14 @@
+version: "2"
+authtoken: 31GJ9D5uusYhTwsealRR1vQClVU_6b1LvQaYo5MRS8NdcvRQr
+tunnels:
+  site:
+    addr: 8000
+    proto: http
+    schemes :
+      - https
+
+  vite:
+    addr: 5173
+    proto: http
+    schemes :
+      - https

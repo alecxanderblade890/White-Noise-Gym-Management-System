@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('payment_method', ['None', 'Cash', 'GCash', 'Bank Transfer']);
             $table->unsignedInteger('payment_amount');
             $table->json('items_bought')->nullable();
-            $table->enum('purpose_of_visit', ['Membership', 'Membership Term', 'Personal Trainer', 'Gym Use', 'Gym Use & Membership', 'Gym Use & Membership Term', 'Gym Use & Personal Trainer']);
+            $table->enum('purpose_of_visit', ['Membership', 'Membership Term', 'Personal Trainer', 'Gym Use', 'Gym Use & Membership Payment', 'Gym Use & Membership Term Payment', 'Gym Use & Personal Trainer Payment']);
             $table->string('staff_assigned');
             $table->boolean('upgrade_gym_access'); 
             $table->text('notes')->nullable(); 
