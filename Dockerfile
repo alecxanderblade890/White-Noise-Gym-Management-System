@@ -4,8 +4,8 @@ FROM php:8.2-fpm
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git curl unzip libpng-dev libonig-dev libxml2-dev zip \
-    libzip-dev mariadb-client nodejs npm netcat-openbsd \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    libzip-dev nodejs npm netcat-openbsd sqlite3 libsqlite3-dev \
+    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd zip
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

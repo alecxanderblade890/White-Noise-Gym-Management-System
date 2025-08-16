@@ -134,6 +134,9 @@ class MemberController extends Controller
                 $validated['pt_end_date'] = now()->addMonth()->toDateString();
             }
 
+            // Ensure with_pt value matches the ENUM case
+            $withPt = $validated['with_pt'] === 'None' ? 'None' : '1 month';
+            
             Member::create([
                 'photo_url' => $result['secure_url'],
                 'full_name' => $validated['full_name'],
@@ -153,8 +156,8 @@ class MemberController extends Controller
                 'pt_end_date' => $validated['pt_end_date'] ?? null,
                 'membership_term_gym_access' => $validated['membership_term_gym_access'],
                 'member_type' => $validated['member_type'],
-                'with_pt' => $validated['with_pt'],
-                'with_pt_billing_rate' => $validated['with_pt_billing_rate'],
+                'with_pt' => $withPt,
+                'with_pt_billing_rate' => $withPt === 'None' ? 0 : $validated['with_pt_billing_rate'],
                 'membership_term_billing_rate' => $validated['membership_term_billing_rate'],
                 'emergency_contact_person' => $validated['emergency_contact_person'],
                 'emergency_contact_number' => $validated['emergency_contact_number'],
@@ -188,6 +191,19 @@ class MemberController extends Controller
             }
 
             try {
+                // Ensure with_pt value matches the ENUM case
+                if (isset($validated['with_pt'])) {
+                    $validated['with_pt'] = $validated['with_pt'] === 'None' ? 'None' : '1 month';
+                    if ($validated['with_pt'] === 'None') {
+                        $validated['with_pt_billing_rate'] = 0;
+                        $validated['pt_start_date'] = null;
+                        $validated['pt_end_date'] = null;
+                    } else if ($validated['with_pt'] === '1 month' && empty($validated['pt_start_date'])) {
+                        $validated['pt_start_date'] = now()->toDateString();
+                        $validated['pt_end_date'] = now()->addMonth()->toDateString();
+                    }
+                }
+                
                 $member->update($validated);
                 return redirect()->route('member-details.show', $member->id)->with('success', 'Member updated successfully!');
             } catch (ValidationException $e) {

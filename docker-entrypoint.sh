@@ -1,12 +1,13 @@
 #!/bin/sh
 set -e
 
-# Wait for MySQL
-echo "Waiting for MySQL..."
-until nc -z -v -w30 "$DB_HOST" "$DB_PORT"; do
-  echo "Waiting for database connection..."
-  sleep 2
-done
+# Ensure SQLite database file exists and is writable
+if [ "$DB_CONNECTION" = "sqlite" ]; then
+    touch "$DB_DATABASE"
+    chown www-data:www-data "$DB_DATABASE"
+    chmod 666 "$DB_DATABASE"
+    echo "SQLite database file ready at $DB_DATABASE"
+fi
 
 # Run package discovery now that app is fully copied
 php artisan package:discover --ansi

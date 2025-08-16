@@ -1,3 +1,181 @@
 <x-layout>
-    sales report
+    <div class="container mx-auto px-4 py-8">
+        <!-- Back button -->
+        <x-navigate-back :href="route('dashboard')">
+            Back to Dashboard
+        </x-navigate-back>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">Sales Report</h1>
+            
+            <!-- Date Range Selector -->
+            <div class="mb-8">
+                <form id="salesReportForm" action="{{route('sales-report.index')}}" method="GET" class="flex flex-col sm:flex-row gap-4 items-end">
+                    @csrf
+                    <div class="w-full sm:w-64">
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" id="start_date" name="start_date" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black"
+                               value="{{ $startDate }}">
+                    </div>
+                    <div class="w-full sm:w-64">
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" id="end_date" name="end_date" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black"
+                               value="{{ $endDate }}">
+                    </div>
+                    <button type="submit" 
+                            class="w-full sm:w-auto px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors">
+                        Generate Report
+                    </button>
+                </form>
+            </div>
+
+            <!-- Sales Summary -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Particulars</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Clients</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <!-- New Memberships Section -->
+                        <tr class="bg-gray-50">
+                            <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">New Memberships</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Memberships Only</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($membershipsOnlyCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($membershipsOnlyAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Walk-in Regular</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkInRegularCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($walkInRegularAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Walk-in Student</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkInStudentCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($walkInStudentAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">1 Month Regular</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($oneMonthRegularCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($oneMonthRegularAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">1 Month Student</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($oneMonthStudentCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($oneMonthStudentAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">3 Months Regular</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($threeMonthsRegularCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($threeMonthsRegularAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">3 Months Student</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($threeMonthsStudentCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($threeMonthsStudentAmount ?? 0, 2) }}</td>
+                        </tr>
+
+                        <!-- Walk-in Sales Section -->
+                        <tr class="bg-gray-50">
+                            <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Walk-in Sales</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Students</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkInStudentsCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($walkInStudentsAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Regular</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkInRegularTotalCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($walkInRegularTotalAmount ?? 0, 2) }}</td>
+                        </tr>
+
+                        <!-- Member Gym Access Section -->
+                        <tr>
+                            <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Member Gym Access</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Regular - 1 Month</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($regularOneMonthCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($regularOneMonthAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Regular - 3 Months</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($regularThreeMonthsCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($regularThreeMonthsAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Student - 1 Month</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($studentOneMonthCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($studentOneMonthAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Student - 3 Months</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($studentThreeMonthsCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($studentThreeMonthsAmount ?? 0, 2) }}</td>
+                        </tr>
+
+                        <!-- Total Row -->
+                        <tr class="bg-gray-100 border-t-2 border-gray-300">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">TOTAL</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">{{ number_format($totalClients ?? 0) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-lg font-bold text-gray-900 text-right">₱ {{ number_format($totalAmount ?? 0, 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Print and Export Buttons -->
+            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-end">
+                <button onclick="window.print()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Print Report
+                </button>
+                <button id="exportPdf" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
+                    Export as PDF
+                </button>
+                <button id="exportExcel" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700">
+                    Export as Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date range to current month if not set
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+            
+            if (!startDateInput.value) {
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                startDateInput.value = firstDay.toISOString().split('T')[0];
+            }
+            
+            if (!endDateInput.value) {
+                endDateInput.value = new Date().toISOString().split('T')[0];
+            }
+            
+            // Export to PDF
+            document.getElementById('exportPdf').addEventListener('click', function() {
+                alert('Export to PDF functionality will be implemented here');
+                // Implementation for PDF export
+            });
+            
+            // Export to Excel
+            document.getElementById('exportExcel').addEventListener('click', function() {
+                alert('Export to Excel functionality will be implemented here');
+                // Implementation for Excel export
+            });
+        });
+    </script>
+    @endpush
 </x-layout>
