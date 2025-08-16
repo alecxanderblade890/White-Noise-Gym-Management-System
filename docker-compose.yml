@@ -16,9 +16,10 @@ services:
       CLOUDINARY_API_KEY: 395673266618914
       CLOUDINARY_API_SECRET: QAEtxszJ3XxsG0JZltnX71U42TQ
       CLOUDINARY_CLOUD_NAME: dq10qlo0n
+      PORT: 8080   # matches Dockerfile + nginx.conf
     working_dir: /var/www/html
     volumes:
-      # Only mount folders that need persistence, NOT public/build
+      # Only mount folders that need persistence, NOT build artifacts
       - .:/var/www/html
       - ./app:/var/www/html/app
       - ./bootstrap:/var/www/html/bootstrap
@@ -29,23 +30,8 @@ services:
       - ./composer.json:/var/www/html/composer.json
       - ./composer.lock:/var/www/html/composer.lock
       - storage_data:/var/www/html/storage
-    # healthcheck:
-    #   test: ["CMD", "php", "-v"]
-    #   interval: 30s
-    #   timeout: 5s
-    #   retries: 3
-
-  laravel-nginx:
-    image: nginx:stable-alpine
-    container_name: laravel-nginx
-    restart: unless-stopped
-    depends_on:
-      - laravel-app
     ports:
-      - "8080:80"
-    volumes:
-      - ./public:/var/www/html/public
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - "8080:8080"   # Local access at http://localhost:8080
 
 volumes:
   storage_data:

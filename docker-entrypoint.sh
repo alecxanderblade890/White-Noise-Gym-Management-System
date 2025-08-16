@@ -11,13 +11,11 @@ fi
 
 # Run package discovery now that app is fully copied
 php artisan package:discover --ansi
-
-# Clear and cache configs
 php artisan config:clear
 php artisan config:cache
 php artisan route:cache
 
-# Run migrations and seed only on first run
+# Run migrations & seed only once
 if [ ! -f "/var/www/html/first-run-complete" ]; then
     echo "First run detected - running migrations and seeding..."
     php artisan migrate:fresh --seed --force
@@ -25,5 +23,5 @@ if [ ! -f "/var/www/html/first-run-complete" ]; then
     echo "Migrations and seeding completed successfully"
 fi
 
-# Start PHP-FPM
-exec php-fpm
+# Start Supervisor (which runs php-fpm + nginx)
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
