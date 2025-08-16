@@ -26,5 +26,4 @@ if [ ! -f "/var/www/html/first-run-complete" ]; then
 fi
 
 # Start PHP-FPM
-# exec php-fpm
-exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+exec php-fpm
