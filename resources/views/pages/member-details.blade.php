@@ -27,7 +27,10 @@
                             <img src="{{ asset('images/default_avatar.png') }}" alt="Default Avatar" class="w-full h-full object-cover">
                         @endif
                     </div>
-                    <h1 class="mt-4 text-2xl font-bold text-gray-800 text-center pb-5">{{ $member->full_name }}</h1>
+                    <h1 class="mt-4 text-2xl font-bold text-gray-800 text-center">{{ $member->full_name }}</h1>
+                    @if($member->white_noise_id)
+                        <p class="text-gray-600 mb-5">{{ $member->white_noise_id }}</p>
+                    @endif
                     <p class="text-gray-600">Member Since {{ \Carbon\Carbon::parse($member->created_at)->format('M Y') }}</p>
                     
                     <!-- Membership Status Badge -->
@@ -115,9 +118,9 @@
                                 <p class="font-medium {{ $isActiveMembership ? 'text-green-600' : 'text-red-600' }}">
                                     {{ \Carbon\Carbon::parse($member->membership_end_date)->format('F j, Y') }}
                                     @if($isActiveMembership)
-                                        ({{ (int)(\Carbon\Carbon::parse($member->membership_end_date)->addDay()->diffInDays(now()) * -1 + 1) }} days remaining)
+                                        ({{ (int)abs(\Carbon\Carbon::parse($member->membership_end_date)->addDay()->diffInDays(now())) }} days remaining)
                                     @else
-                                        (Expired {{ round(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) *-1 - 1}} days ago)
+                                        (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} days ago)
                                     @endif
                                 </p>
                             </div>
@@ -131,9 +134,9 @@
                                     <p class="font-medium {{ $isActiveGymAccess ? 'text-green-600' : 'text-red-600' }}">
                                         {{ \Carbon\Carbon::parse($member->gym_access_end_date)->format('F j, Y') }}
                                         @if($isActiveGymAccess)
-                                            ({{ (int)(\Carbon\Carbon::parse($member->gym_access_end_date)->addDay()->diffInDays(now()) * -1 + 1) }} days remaining)
+                                            ({{ (int)abs(\Carbon\Carbon::parse($member->gym_access_end_date)->addDay()->diffInDays(now())) }} days remaining)
                                         @else
-                                            (Expired {{ round(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) *-1 - 1}} days ago)
+                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} days ago)
                                         @endif
                                     </p>
                                 @endif
@@ -148,9 +151,9 @@
                                     <p class="font-medium {{ $isActivePT ? 'text-green-600' : 'text-red-600' }}">
                                         {{ \Carbon\Carbon::parse($member->pt_end_date)->format('F j, Y') }}
                                         @if($isActivePT)
-                                            ({{(int)(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now()) * -1 + 1) }} days remaining)
+                                            ({{(int)abs(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now())) }} days remaining)
                                         @else
-                                            (Expired {{ round(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) *-1 - 1 }} days ago)
+                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} days ago)
                                         @endif
                                     </p>
                                 @endif

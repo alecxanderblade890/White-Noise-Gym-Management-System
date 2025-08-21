@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('members', function (Blueprint $table) {
             $table->id();
+            $table->string('white_noise_id')->unique();
             $table->string('full_name');
             $table->string('photo_url');
             $table->string('address');

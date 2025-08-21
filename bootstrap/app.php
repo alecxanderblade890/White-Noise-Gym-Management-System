@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'cache.nocache' => NoCache::class,
             'role' => \App\Http\Middleware\CheckRole::class,
+            'web' => \App\Http\Middleware\UpgradeToHttpsUnderNgrok::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -25,13 +25,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (validateMemberBtn) {
         validateMemberBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            const memberId = document.getElementById('member_id').value;
+            const memberId = document.getElementById('white_noise_id');
+            const fullName = document.getElementById('full_name');
             const labelText = document.getElementById('label_text');
+            
             const spinner = document.getElementById('validate-member-spinner');
         
         if (memberId) {
             spinner.classList.remove('hidden');
-            fetch(`/validate-member-id/${memberId}`)
+            fetch(`/validate-member-id/${memberId.value}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
@@ -43,17 +45,45 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     else {
                         // Set the member ID in the form
-                        document.getElementById('form_member_id').value = data.member_id;                        
+                        memberId.value = data.white_noise_id;
+                        // Also set the hidden form field
+                        const whiteNoiseIdForm = document.getElementById('white_noise_id_form');
+                        if (whiteNoiseIdForm) {
+                            whiteNoiseIdForm.value = memberId.value;
+                        }
+                        
+                        fullName.value = data.full_name;
                         // Update the validation message
                         labelText.textContent = "Member is valid!";
                         labelText.classList.add('text-green-500');
                         labelText.classList.remove('text-red-500');
 
-                        window.memberData = {
-                            memberType: data.member_type,
-                            membershipTermGymAccess: data.membership_term_gym_access,
-                            withPt: data.with_pt
-                        };
+                        if(data.member_type == 'Student') {
+                            document.getElementById('member_type_student').checked = true;
+                        }
+                        else {
+                            document.getElementById('member_type_regular').checked = true;
+                        }
+                        
+                        if(data.membership_term_gym_access == '1 month') {
+                            document.getElementById('gym_access_1_month').checked = true;
+                        }
+                        else if(data.membership_term_gym_access == '3 months') {
+                            document.getElementById('gym_access_3_month').checked = true;
+                        }
+                        else if(data.membership_term_gym_access == 'Walk in') {
+                            document.getElementById('gym_access_walk_in').checked = true;
+                        }
+                        else {
+                            document.getElementById('gym_access_none').checked = true;
+                        }
+
+                        if(data.with_pt == 'None') {
+                            document.getElementById('personal_trainer_none').checked = true;
+                        }
+                        else {
+                            document.getElementById('personal_trainer_1_month').checked = true;
+                        }
                         
                         // Show the form
                         const form = document.getElementById('daily-log-form');
@@ -75,15 +105,21 @@ document.addEventListener('DOMContentLoaded', function() {
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updatePaymentTotal);
     });
-    
-    // Add change event listener for purpose of visit
-    const purposeOfVisit = document.getElementById('purpose_of_visit');
-    if (purposeOfVisit) {
-        purposeOfVisit.addEventListener('change', updatePaymentTotal);
-    }
+
+    const purposeOfVisitCheckboxes = document.querySelectorAll('input[name="purpose_of_visit[]"]');
+    purposeOfVisitCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updatePaymentTotal);
+    });
+
+    // Add change event listeners for radio buttons
+    ['gym_access', 'member_type'].forEach(name => {
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        radios.forEach(radio => {
+            radio.addEventListener('change', updatePaymentTotal);
+        });
+    });
 });
 
-// Item prices (you can modify these values as needed)
 const itemPrices = {
     'Pocari Sweat': 50,
     'Gatorade Blue': 65,
@@ -97,71 +133,59 @@ const itemPrices = {
     'Black - Medium': 300
 };
 
-// Function to calculate and update the total payment amount
+
 // Function to calculate and update the total payment amount
 function updatePaymentTotal() {
     const paymentInput = document.getElementById('payment_amount');
-    const purposeOfVisit = document.getElementById('purpose_of_visit');
-
+    const selectedPurposes = document.querySelectorAll('input[name="purpose_of_visit[]"]:checked');
+    const selectedGymAccess = document.querySelector('input[name="gym_access"]:checked');
+    const selectedMemberType = document.querySelector('input[name="member_type"]:checked');
     let totalAmount = 0;
 
-    // 1. Calculate the base amount based on the purpose of visit
-    if (purposeOfVisit.value === 'Membership') {
-        totalAmount = 500;
-    } else if (purposeOfVisit.value === 'Membership Term') {
-        if (window.memberData.membershipTermGymAccess === '1 month') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 1000 : 1500);
-        } else if (window.memberData.membershipTermGymAccess === '3 months') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 2500 : 4500);
-        }
-    } else if (purposeOfVisit.value === 'Personal Trainer') {
-        if (window.memberData.withPt === '1 month') {
-            totalAmount += 3000;
-        } else if (window.memberData.withPt === '3 months') {
-            totalAmount += 9000; // Assuming this is a missing value from your original code, as it was `0`.
-        }
-    } else if (purposeOfVisit.value === 'Gym Use') {
-        if (window.memberData.membershipTermGymAccess === 'Walk in') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 100 : 150);
-        }
-    } else if (purposeOfVisit.value === 'Gym Use & Membership Payment') {
-        if (window.memberData.membershipTermGymAccess === 'Walk in') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 600 : 650);
-        } else if (window.memberData.membershipTermGymAccess === '1 month' || window.memberData.membershipTermGymAccess === '3 months') {
-            totalAmount += 500;
-        }
-    } else if (purposeOfVisit.value === 'Gym Use & Membership Term Payment') {
-        if (window.memberData.membershipTermGymAccess === 'Walk in') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 100 : 150);
-        } else if (window.memberData.membershipTermGymAccess === '1 month') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 1000 : 1500);
-        } else if (window.memberData.membershipTermGymAccess === '3 months') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 2500 : 4500);
-        }
-    } else if (purposeOfVisit.value === 'Gym Use & Personal Trainer Payment') {
-        if (window.memberData.membershipTermGymAccess === 'Walk in' && window.memberData.withPt === 'None') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 100 : 150);
-        } else if (window.memberData.membershipTermGymAccess === 'Walk in' && window.memberData.withPt === '1 month') {
-            totalAmount += (window.memberData.memberType === 'Student' ? 3100 : 3500);
-        } else if (window.memberData.membershipTermGymAccess === '1 month' && window.memberData.withPt === '1 month') {
-            totalAmount += 3000;
-        } else if (window.memberData.membershipTermGymAccess === '3 months' && window.memberData.withPt === '1 month') {
-            totalAmount += 3000;
-        }
-    }
-
-    // 2. Add the price of any selected items
+    // Add prices of selected items
     document.querySelectorAll('input[name="items[]"]:checked').forEach(checkbox => {
         const itemName = checkbox.value;
         totalAmount += itemPrices[itemName] || 0;
     });
 
-    // 3. Add the price of any selected t-shirts
+    // Add prices of selected t-shirts
     document.querySelectorAll('input[name="t_shirts[]"]:checked').forEach(checkbox => {
         const itemName = checkbox.value;
         totalAmount += itemPrices[itemName] || 0;
     });
+    
+    // Process all selected purposes of visit
+    selectedPurposes.forEach(checkbox => {
+        const purpose = checkbox.value;
+        
+        // Handle different payment types
+        if (purpose === 'Membership Payment' || purpose === 'Renew Membership') {
+            totalAmount += 500;
+        } 
+        else if (purpose === 'Personal Trainer Payment' || purpose === 'Renew Personal Trainer') {
+            totalAmount += 3000;
+        }
+        else if (purpose === 'Personal Trainer 1 Day') {
+            totalAmount += 300;
+        }
+        else if ((purpose === 'Gym Access Payment' || purpose === 'Renew Gym Access') && selectedGymAccess) {
+            const gymAccessValue = selectedGymAccess.value.toLowerCase();
+            const isStudent = selectedMemberType && selectedMemberType.value === 'Student';
+            
+            if (gymAccessValue.includes('1 month')) {
+                totalAmount += isStudent ? 1000 : 1500;
+            }
+            else if (gymAccessValue.includes('3 month')) {
+                totalAmount += isStudent ? 2500 : 4500;
+            }
+            else if (gymAccessValue.includes('walk in')) {
+                totalAmount += isStudent ? 100 : 150;
+            }
+        }
+    });
 
-    // 4. Update the payment input field
-    paymentInput.value = Math.max(0, totalAmount);
+    // Update the payment input field and ensure it's a valid number
+    if (paymentInput) {
+        paymentInput.value = Math.max(0, totalAmount);
+    }
 }

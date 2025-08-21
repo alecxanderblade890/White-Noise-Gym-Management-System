@@ -29,13 +29,16 @@ class DashboardController extends Controller
             $bankTransferTotal = DailyLog::whereDate('date', $today)
                 ->where('payment_method', 'Bank Transfer')
                 ->sum('payment_amount');
+
+            $totalClientsToday = DailyLog::whereDate('date', $today)->count();
+            $totalItemsSoldToday = DailyLog::whereDate('date', $today)->sum('payme');
             
             // Get current date and 7 days from now
             $now = Carbon::now();
             $sevenDaysFromNow = $now->copy()->addDays(7);
             
             // Get members with active memberships that are expiring in 7 days or less
-            $members = Member::where(function($query) use ($now, $sevenDaysFromNow) {
+            $membersExpiring = Member::where(function($query) use ($now, $sevenDaysFromNow) {
                 // Check for memberships expiring in the next 7 days
                 $query->where(function($q) use ($now, $sevenDaysFromNow) {
                     $q->where('membership_end_date', '>=', $now)
@@ -50,12 +53,22 @@ class DashboardController extends Controller
             })->orderBy('membership_end_date', 'asc')
             ->get();
 
+            $membersExpired = Member::where(function($query) use ($now) {
+                // Show members where any membership type is expired
+                $query->where('membership_end_date', '<', $now)
+                    ->orWhere('gym_access_end_date', '<', $now)
+                    ->orWhere('pt_end_date', '<', $now);
+            })->orderBy('membership_end_date', 'asc')
+            ->get();
+
             return view('pages.dashboard', [
                 'totalSalesToday'       => $totalSalesToday,
                 'cashTotal'             => $cashTotal,
                 'gcashTotal'            => $gcashTotal,
                 'bankTransferTotal'     => $bankTransferTotal,
-                'members'               => $members,
+                'totalClientsToday'     => $totalClientsToday,
+                'membersExpiring'       => $membersExpiring,
+                'membersExpired'        => $membersExpired,
                 'now'                   => $now,
                 'sevenDaysFromNow'      => $sevenDaysFromNow,
             ]);

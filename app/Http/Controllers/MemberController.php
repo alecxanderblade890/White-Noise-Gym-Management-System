@@ -49,20 +49,21 @@ class MemberController extends Controller
     }
     public function validateMemberId($id)
     {
-        $member = Member::where('id', $id)->first();
+        $member = Member::where('white_noise_id', $id)->orWhere('full_name', $id)->first();
 
         if (!$member) {
             return response()->json([
                 'success' => false,
                 'error' => 'Member ID is invalid',
-                'member_id' => null
+                'white_noise_id' => null
             ]);
         }
     
         return response()->json([
             'success' => true,
             'error' => null,
-            'member_id' => $member->id,
+            'full_name' => $member->full_name,
+            'white_noise_id' => $member->white_noise_id,
             'member_type' => $member->member_type,
             'membership_term_gym_access' => $member->membership_term_gym_access,
             'with_pt' => $member->with_pt
@@ -72,6 +73,7 @@ class MemberController extends Controller
     public function validateMember(Request $request, $memberId = null)
     {
         $rules = [
+            'white_noise_id' => 'required|string|max:255',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:members,email',
@@ -101,43 +103,53 @@ class MemberController extends Controller
 
         if ($memberId) {
             $rules['email'] = 'required|email|max:255|unique:members,email,' . $memberId;
+            $rules['white_noise_id'] = 'required|string|max:255|unique:members,white_noise_id,' . $memberId;
         }
 
         return Validator::make($request->all(), $rules);
     }
     public function addMember(Request $request)
     {
-        $validator = $this->validateMember($request);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $validated = $validator->validated();
-        $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
-            'folder' => 'members',
-        ]);
-
         try {
-            
-            if ($validated['membership_term_gym_access'] === '1 month') {
-                $validated['gym_access_start_date'] = now()->toDateString();
-                $validated['gym_access_end_date'] = now()->addMonth()->toDateString();
-            }
-            else if ($validated['membership_term_gym_access'] === '3 months') {
-                $validated['gym_access_start_date'] = now()->toDateString();
-                $validated['gym_access_end_date'] = now()->addMonths(3)->toDateString();
+
+            $validator = $this->validateMember($request);
+
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
             }
 
-            if($validated['with_pt'] === '1 month'){
-                $validated['pt_start_date'] = now()->toDateString();
-                $validated['pt_end_date'] = now()->addMonth()->toDateString();
-            }
+            $validated = $validator->validated();
+            $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
+                'folder' => 'members',
+            ]);
+
+            $membershipStartDate = $request->membership_start_date;
+            $membershipEndDate = $request->membership_end_date;
+            $gymAccessStartDate = $request->gym_access_start_date;
+            $gymAccessEndDate = $request->gym_access_end_date;
+            $ptStartDate = $request->pt_start_date;
+            $ptEndDate = $request->pt_end_date;
+            
+            
+            // if ($validated['membership_term_gym_access'] === '1 month') {
+            //     $validated['gym_access_start_date'] = $startDate->toDateString();
+            //     $validated['gym_access_end_date'] = $startDate->copy()->addDays(30)->toDateString();
+            // }
+            // else if ($validated['membership_term_gym_access'] === '3 months') {
+            //     $validated['gym_access_start_date'] = $startDate->toDateString();
+            //     $validated['gym_access_end_date'] = $startDate->copy()->addDays(90)->toDateString();
+            // }
+
+            // if($validated['with_pt'] === '1 month'){
+            //     $validated['pt_start_date'] = $startDate->toDateString();
+            //     $validated['pt_end_date'] = $startDate->copy()->addDays(30)->toDateString();
+            // }
 
             // Ensure with_pt value matches the ENUM case
             $withPt = $validated['with_pt'] === 'None' ? 'None' : '1 month';
             
             Member::create([
+                'white_noise_id' => $validated['white_noise_id'],
                 'photo_url' => $result['secure_url'],
                 'full_name' => $validated['full_name'],
                 'email' => $validated['email'],
@@ -148,12 +160,12 @@ class MemberController extends Controller
                 'id_presented' => $validated['id_presented'],
                 'id_number' => $validated['id_number'],
                 'address' => $validated['address'],
-                'membership_start_date' => now()->toDateString(),
-                'membership_end_date' => now()->addYear()->toDateString(), 
-                'gym_access_start_date' => $validated['gym_access_start_date'] ?? null,
-                'gym_access_end_date' => $validated['gym_access_end_date'] ?? null,
-                'pt_start_date' => $validated['pt_start_date'] ?? null,
-                'pt_end_date' => $validated['pt_end_date'] ?? null,
+                'membership_start_date' => $membershipStartDate, //now()->toDateString()
+                'membership_end_date' => $membershipEndDate, //now()->addDays(365)->toDateString()
+                'gym_access_start_date' => $gymAccessStartDate ?? null,
+                'gym_access_end_date' => $gymAccessEndDate ?? null,
+                'pt_start_date' => $ptStartDate ?? null,
+                'pt_end_date' => $ptEndDate ?? null,
                 'membership_term_gym_access' => $validated['membership_term_gym_access'],
                 'member_type' => $validated['member_type'],
                 'with_pt' => $withPt,
@@ -176,21 +188,20 @@ class MemberController extends Controller
 
         if($request->password === $staffUser->password){
             $validator = $this->validateMember($request, $member->id);
-
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
-
-            $validated = $validator->validated();
-
-            if ($request->hasFile('photo')) {
-                $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
-                    'folder' => 'members',
-                ]);
-                $validated['photo_url'] = $result['secure_url'];
-            }
-
             try {
+                if ($validator->fails()) {
+                    return redirect()->back()->withErrors($validator)->withInput();
+                }
+
+                $validated = $validator->validated();
+
+                if ($request->hasFile('photo')) {
+                    $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
+                        'folder' => 'members',
+                    ]);
+                    $validated['photo_url'] = $result['secure_url'];
+                }
+                
                 // Ensure with_pt value matches the ENUM case
                 if (isset($validated['with_pt'])) {
                     $validated['with_pt'] = $validated['with_pt'] === 'None' ? 'None' : '1 month';
@@ -200,7 +211,7 @@ class MemberController extends Controller
                         $validated['pt_end_date'] = null;
                     } else if ($validated['with_pt'] === '1 month' && empty($validated['pt_start_date'])) {
                         $validated['pt_start_date'] = now()->toDateString();
-                        $validated['pt_end_date'] = now()->addMonth()->toDateString();
+                        $validated['pt_end_date'] = now()->addDays(30)->toDateString();
                     }
                 }
                 

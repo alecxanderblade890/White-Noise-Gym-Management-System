@@ -16,12 +16,19 @@ return new class extends Migration
             $table->string('date');
             $table->time('time_in');
             $table->time('time_out')->nullable();
-            $table->foreignId('member_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('white_noise_id');
+            $table->foreign('white_noise_id')
+                  ->references('white_noise_id')
+                  ->on('members')
+                  ->onDelete('cascade');//or ->onDelete('set null');
             $table->string('full_name');
             $table->enum('payment_method', ['None', 'Cash', 'GCash', 'Bank Transfer']);
             $table->unsignedInteger('payment_amount');
+            $table->enum('member_type', ['Regular', 'Student']);
+            $table->enum('gym_access', ['None', '1 month', '3 months', 'Walk in']);
+            $table->enum('personal_trainer', ['None', '1 month']);
             $table->json('items_bought')->nullable();
-            $table->enum('purpose_of_visit', ['Membership', 'Membership Term', 'Personal Trainer', 'Gym Use', 'Gym Use & Membership Payment', 'Gym Use & Membership Term Payment', 'Gym Use & Personal Trainer Payment']);
+            $table->json('purpose_of_visit');
             $table->string('staff_assigned');
             $table->boolean('upgrade_gym_access'); 
             $table->text('notes')->nullable(); 

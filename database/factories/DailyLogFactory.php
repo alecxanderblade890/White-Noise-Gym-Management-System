@@ -22,7 +22,7 @@ class DailyLogFactory extends Factory
             'date' => fake()->date('Y-m-d', '2025-01-01'), // Start date to now
             'time_in' => fake()->time(),
             'time_out' => fake()->time(),
-            'member_id' => $member->id,
+            'white_noise_id' => $member->white_noise_id,
             'full_name' => $member->full_name,
             'payment_method' => fake()->randomElement(['None', 'Cash', 'GCash', 'Bank Transfer']),
             'payment_amount' => fake()->randomFloat(2, 100, 1000), // Random amount between 100 and 1000

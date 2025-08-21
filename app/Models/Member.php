@@ -17,6 +17,7 @@ class Member extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'white_noise_id',
         'full_name',
         'photo_url',
         'membership_term_gym_access',

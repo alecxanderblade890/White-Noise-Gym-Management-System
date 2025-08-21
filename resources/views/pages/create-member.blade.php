@@ -179,6 +179,14 @@
 
                     <!-- Member Type -->
                     <div>
+                        <label for="white_noise_id" class="block text-sm font-medium text-gray-700 mb-1">White Noise ID <span class="text-red-500">*</span></label>
+                        <input type="text" id="white_noise_id" name="white_noise_id" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        @error('white_noise_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
                         <label for="member_type" class="block text-sm font-medium text-gray-700 mb-1">Member Type <span class="text-red-500">*</span></label>
                         <select id="member_type" name="member_type" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -192,7 +200,7 @@
                      <!-- Membership Term (Gym Access) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="membership_term_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Membership Term (Gym Access) <span class="text-red-500">*</span></label>
+                            <label for="membership_term_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Gym Access<span class="text-red-500">*</span></label>
                             <select id="membership_term_gym_access" name="membership_term_gym_access" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="None" {{ old('membership_term_gym_access') == 'None' ? 'selected' : '' }}>None</option>
@@ -206,7 +214,7 @@
                         </div>
                         <!-- Membership Term Billing Rate -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Membership Term Billing Rate</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Gym Access Billing Rate</label>
                             <div class="mt-1 flex items-center">
                                 <input type="hidden" id="membership_term_billing_rate_hidden" name="membership_term_billing_rate" value="0">
                                 <input type="text" id="membership_term_billing_rate" readonly
@@ -250,34 +258,73 @@
                     </div>
                     <!-- Membership Period -->
                     <div>
-                        <input type="hidden" id="current_end_date" value="">
-                        <input type="hidden" id="gym_access_end_date" class="hidden" readonly>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Membership Period <span class="text-red-500">*</span></label>
                         <div class="flex items-center space-x-2">
-                            <input type="text" readonly
+                            <input type="date"
+                                    id="membership_start_date"
+                                    name="membership_start_date"
                                    class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
-                                   value="{{ now()->format('F d, Y') }}">
+                                   value="">
                             <span class="text-gray-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </span>
-                            <input type="text" readonly
+                            <input type="date"
+                                    id="membership_end_date"
+                                    name="membership_end_date"
                                    class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
-                                   value="{{ now()->addYear()->format('F d, Y') }}">
+                                   value="">
                         </div>
                         <p class="mt-1 text-xs text-gray-500">1 Year Membership Period</p>
-                        @error('payment_date_membership')
+                        @error('membership_end_date' || 'membership_start_date')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <!-- Payment Date (Gym Access) -->
                     <div>
-                        <label for="gym_access_start_date" class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Gym Access)</label>
-                        <input type="text" id="gym_access_start_date" name="gym_access_start_date" readonly
-                               class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
-                               value="{{ old('gym_access_start_date') }}">
-                        @error('gym_access_start_date')
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Date (Gym Access) <span class="text-red-500">*</span></label>
+                        <div class="flex items-center space-x-2">
+                            <input type="date"
+                                    id="gym_access_start_date"
+                                    name="gym_access_start_date"
+                                   class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                                   value="">
+                            <span class="text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                            <input type="date"
+                                    id="gym_access_end_date"
+                                    name="gym_access_end_date"
+                                   class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                                   value="">
+                        </div>
+                        @error('gym_access_end_date' || 'gym_access_start_date')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Personal Trainer Period <span class="text-red-500">*</span></label>
+                        <div class="flex items-center space-x-2">
+                            <input type="date"
+                                    id="pt_start_date"
+                                    name="pt_start_date"
+                                   class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                                   value="">
+                            <span class="text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                            <input type="date"
+                                    id="pt_end_date"
+                                    name="pt_end_date"
+                                   class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                                   value="">
+                        </div>
+                        @error('pt_end_date' || 'pt_start_date')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

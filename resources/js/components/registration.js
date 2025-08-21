@@ -59,40 +59,40 @@ function updateMembershipTermBillingRate() {
     const baseRateField = document.getElementById('membership_term_billing_rate');
     const hiddenRateField = document.getElementById('membership_term_billing_rate_hidden');
     const billingRateSuffix = document.getElementById('billing-rate-suffix');
-    const gymAccessStartDate = document.getElementById('gym_access_start_date');
-    const gymAccessEndDate = document.getElementById('gym_access_end_date');
-    const currentEndDate = document.getElementById('current_end_date');
+    // const gymAccessStartDate = document.getElementById('gym_access_start_date');
+    // const gymAccessEndDate = document.getElementById('gym_access_end_date');
+    // const currentEndDate = document.getElementById('current_end_date');
 
     
     
-    if (!memberType || !membershipTerm || !baseRateField || !hiddenRateField || !billingRateSuffix || !gymAccessStartDate) return;
+    if (!memberType || !membershipTerm || !baseRateField || !hiddenRateField || !billingRateSuffix) return;
     
     let rate = 0;
     
-    if(membershipTerm.value != 'None') {
+    // if(membershipTerm.value != 'None') {
         
-        const date = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        gymAccessStartDate.value = date.toLocaleDateString('en-US', options);
+    //     const date = new Date();
+    //     const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    //     gymAccessStartDate.value = date.toLocaleDateString('en-US', options);
 
-        if(membershipTerm.value == '1 month') {
-            const endDate = currentEndDate.value ? new Date(currentEndDate.value) : new Date();
-            endDate.setMonth(endDate.getMonth() + 1);
-            gymAccessEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        }
-        else if(membershipTerm.value == '3 months') {
-            const endDate = currentEndDate.value ? new Date(currentEndDate.value) : new Date();
-            endDate.setMonth(endDate.getMonth() + 3);
-            gymAccessEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        }
-        else if(membershipTerm.value == 'Walk in') {
-            gymAccessEndDate.value = '';
-        }
-    }
-    else {
-        gymAccessStartDate.value = '';
-        gymAccessEndDate.value = '';
-    }
+    //     if(membershipTerm.value == '1 month') {
+    //         const endDate = currentEndDate.value ? new Date(currentEndDate.value) : new Date();
+    //         endDate.setMonth(endDate.getMonth() + 1);
+    //         gymAccessEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    //     }
+    //     else if(membershipTerm.value == '3 months') {
+    //         const endDate = currentEndDate.value ? new Date(currentEndDate.value) : new Date();
+    //         endDate.setMonth(endDate.getMonth() + 3);
+    //         gymAccessEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    //     }
+    //     else if(membershipTerm.value == 'Walk in') {
+    //         gymAccessEndDate.value = '';
+    //     }
+    // }
+    // else {
+    //     gymAccessStartDate.value = '';
+    //     gymAccessEndDate.value = '';
+    // }
     // Base rates
     if (membershipTerm.value === 'None') {
         rate = 0;
@@ -118,30 +118,29 @@ function updateMembershipTermBillingRate() {
 // Function to update PT billing rate based on selection
 function updatePtBillingRate() {
     const withPt = document.getElementById('with_pt');
-    const currentEndDatePt = document.getElementById('current_end_date_pt');
-    const ptStartDate = document.getElementById('pt_start_date');
-    const ptEndDate = document.getElementById('pt_end_date');
+    // const currentEndDatePt = document.getElementById('current_end_date_pt');
+    // const ptStartDate = document.getElementById('pt_start_date');
+    // const ptEndDate = document.getElementById('pt_end_date');
     const ptBillingRateField = document.getElementById('with_pt_billing_rate');
     const hiddenPtBillingRateField = document.getElementById('with_pt_billing_rate_hidden');
     
     if (!withPt || !ptBillingRateField || !hiddenPtBillingRateField) return;
     
     let rate = 0;
-    
 
     if (withPt.value === '1 month') {
         rate = 3000;
-        const date = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        ptStartDate.value = date.toLocaleDateString('en-US', options);
-        const endDate = currentEndDatePt.value ? new Date(currentEndDatePt.value) : new Date();
-        endDate.setMonth(endDate.getMonth() + 1);
-        ptEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        // const date = new Date();
+        // const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        // ptStartDate.value = date.toLocaleDateString('en-US', options);
+        // const endDate = currentEndDatePt.value ? new Date(currentEndDatePt.value) : new Date();
+        // endDate.setMonth(endDate.getMonth() + 1);
+        // ptEndDate.value = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     }
     else if (withPt.value === 'None') {
         rate = 0;
-        ptStartDate.value = null;
-        ptEndDate.value = null;
+        // ptStartDate.value = null;
+        // ptEndDate.value = null;
     }
     
     // Update the PT billing rate field

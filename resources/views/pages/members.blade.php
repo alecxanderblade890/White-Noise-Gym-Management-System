@@ -13,12 +13,12 @@
     <!-- Search Form -->
     <div class="mb-6">
         <form action="{{ route('member.search') }}" method="GET" class="flex gap-4">
-            <div class="w-100">
+            <div class="w-64">
                 <input type="text" 
                        name="search"
                        placeholder="Search by ID or full name..." 
                        value="{{ request('search') }}" 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black">
+                       class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black">
             </div>
             <button type="submit" class="px-6 py-2 bg-black text-white rounded-md hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
                 Search
@@ -54,13 +54,13 @@
                         <th class="py-3 px-6 text-left w-64">Email</th>
                         <th class="py-3 px-6 text-left w-32">Phone</th>
                         <th class="py-3 px-6 text-left w-32">Member Type</th>
-                        <th class="py-3 px-6 text-left w-32">Membership Term Gym Access</th>
+                        <th class="py-3 px-6 text-left w-32">Gym Access</th>
                         <th class="py-3 px-6 text-left w-40">Membership Start Date</th>
                         <th class="py-3 px-6 text-left w-48">Membership End Date</th>
                         <th class="py-3 px-6 text-left w-32">Gym Access Start Date</th>
                         <th class="py-3 px-6 text-left w-32">Gym Access End Date</th>
                         <th class="py-3 px-6 text-left w-32">With PT</th>
-                        <th class="py-3 px-6 text-left w-32">Membership Term Billing Rate</th>
+                        <th class="py-3 px-6 text-left w-32">Gym Access Billing Rate</th>
                         <th class="py-3 px-6 text-left w-32">With PT Billing Rate</th>
                         <th class="py-3 px-6 text-left w-80">Address</th>          
                         <th class="py-3 px-6 text-left w-32">Date of Birth</th>

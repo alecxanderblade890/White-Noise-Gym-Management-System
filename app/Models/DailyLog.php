@@ -15,9 +15,12 @@ class DailyLog extends Model
         'date',
         'time_in',
         'time_out',
-        'member_id',
+        'white_noise_id',
         'full_name',
         'payment_method',
+        'member_type',
+        'gym_access',
+        'personal_trainer',
         'payment_amount',
         'purpose_of_visit',
         'staff_assigned',
@@ -27,16 +30,16 @@ class DailyLog extends Model
     ];
 
     protected $casts = [
-        'member_id' => 'integer',
         'items_bought' => 'array',
+        'purpose_of_visit' => 'array',
     ];
 
     protected $nullable = [
-        'member_id',
+        'white_noise_id',
     ];
 
     public function member(): BelongsTo
     {
-        return $this->belongsTo(Member::class);
+        return $this->belongsTo(Member::class, 'white_noise_id', 'white_noise_id');
     }
 }

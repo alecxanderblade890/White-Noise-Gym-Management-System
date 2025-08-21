@@ -47,91 +47,92 @@
                             <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">New Memberships</td>
                         </tr>
                         <tr>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Memberships Only</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($membershipsOnlyCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($membershipsOnlyAmount ?? 0, 2) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Memberships</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($membershipCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalMembershipAmount ?? 0, 2) }}</td>
                         </tr>
+                        <!-- New Memberships Section -->
                         <tr class="bg-gray-50">
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Walk-in Regular</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkInRegularCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($walkInRegularAmount ?? 0, 2) }}</td>
+                            <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Membership Term Sales</td>
                         </tr>
                         <tr>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Walk-in Student</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkInStudentCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($walkInStudentAmount ?? 0, 2) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">1 month (Student)</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($studentMembershipsCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalStudentMemberships1monthAmount ?? 0, 2) }}</td>
                         </tr>
                         <tr class="bg-gray-50">
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">1 Month Regular</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($oneMonthRegularCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($oneMonthRegularAmount ?? 0, 2) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">1 month (Regular)</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($regularMembershipsCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalRegularMemberships1monthAmount ?? 0, 2) }}</td>
                         </tr>
                         <tr>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">1 Month Student</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($oneMonthStudentCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($oneMonthStudentAmount ?? 0, 2) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">3 month (Student)</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($studentMemberships3monthCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalStudentMemberships3monthAmount ?? 0, 2) }}</td>
                         </tr>
                         <tr class="bg-gray-50">
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">3 Months Regular</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($threeMonthsRegularCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($threeMonthsRegularAmount ?? 0, 2) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">3 month (Regular)</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($regularMemberships3monthCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalRegularMemberships3monthAmount ?? 0, 2) }}</td>
                         </tr>
-                        <tr>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">3 Months Student</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($threeMonthsStudentCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($threeMonthsStudentAmount ?? 0, 2) }}</td>
-                        </tr>
-
                         <!-- Walk-in Sales Section -->
-                        <tr class="bg-gray-50">
+                        <tr>
                             <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Walk-in Sales</td>
                         </tr>
-                        <tr>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Students</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkInStudentsCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($walkInStudentsAmount ?? 0, 2) }}</td>
-                        </tr>
                         <tr class="bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Student</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkinMembershipsStudentCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalWalkinMembershipsStudentAmount ?? 0, 2) }}</td>
+                        </tr>
+                        <tr>
                             <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Regular</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkInRegularTotalCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($walkInRegularTotalAmount ?? 0, 2) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($walkinMembershipsRegularCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalWalkinMembershipsRegularAmount ?? 0, 2) }}</td>
                         </tr>
-
-                        <!-- Member Gym Access Section -->
-                        <tr>
-                            <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Member Gym Access</td>
-                        </tr>
+                        <!-- PT Sales Section -->
                         <tr class="bg-gray-50">
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Regular - 1 Month</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($regularOneMonthCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($regularOneMonthAmount ?? 0, 2) }}</td>
+                            <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Personal Trainer Sales</td>
                         </tr>
                         <tr>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Regular - 3 Months</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($regularThreeMonthsCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($regularThreeMonthsAmount ?? 0, 2) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">PT Sales</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($ptSalesCount ?? 0) }}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalPTSalesAmount ?? 0, 2) }}</td>
                         </tr>
-                        <tr class="bg-gray-50">
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Student - 1 Month</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($studentOneMonthCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($studentOneMonthAmount ?? 0, 2) }}</td>
+                         <!-- Item Sales Section -->
+                         <tr class="bg-gray-50">
+                            <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Item Sales</td>
                         </tr>
                         <tr>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Student - 3 Months</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($studentThreeMonthsCount ?? 0) }}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($studentThreeMonthsAmount ?? 0, 2) }}</td>
+                            @if(count($itemSales) > 0)
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <ul class="list-disc pl-5">
+                                        @foreach($itemSales as $item)
+                                            <li>{{ $item }}</li>
+                                        @endforeach
+                                    </ul>
+                                </td>   
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">
+                                    {{ count($itemSales) }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-lg font-bold text-gray-900 text-right">
+                                    ₱ {{ 0 }} <!-- Adjust price per item as needed -->
+                                </td>
+                            @else
+                                <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    No item sales found
+                                </td>
+                            @endif
                         </tr>
-
-                        <!-- Total Row -->
-                        <tr class="bg-gray-100 border-t-2 border-gray-300">
+                         <!-- Total Row -->
+                         <tr class="bg-gray-100 border-t-2 border-gray-300">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">TOTAL</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">{{ number_format($totalClients ?? 0) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-lg font-bold text-gray-900 text-right">₱ {{ number_format($totalAmount ?? 0, 2) }}</td>
                         </tr>
+                        
                     </tbody>
                 </table>
             </div>
-
             <!-- Print and Export Buttons -->
             <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-end">
                 <button onclick="window.print()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50">
@@ -140,7 +141,7 @@
                 <button id="exportPdf" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
                     Export as PDF
                 </button>
-                <button id="exportExcel" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700">
+                <button id="exportExcel" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700">
                     Export as Excel
                 </button>
             </div>

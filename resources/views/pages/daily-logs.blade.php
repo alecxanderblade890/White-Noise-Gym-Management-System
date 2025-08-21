@@ -1,13 +1,14 @@
 <x-layout>
     <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8">Daily Logs</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Daily Logs List</h1>
 
         <x-alert/>
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-700">Daily Log List</h2>
-                
+                <div>
+                <h2 class="text-xl font-semibold text-gray-700">Total Sales: ₱ {{ $totalSales ?? 0 }}</h2>
+                </div>
                 <!-- Date Range Filter -->
                 <form id="filter-form" action="{{ route('daily-logs.filter') }}" method="GET" class="flex items-end space-x-4">
                     <div class="flex items-center space-x-2">
@@ -56,13 +57,19 @@
                                 Member ID
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Membership Term
+                                Full Name
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Gym Access
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Purpose
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Items Bought
+                            </th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Staff Assigned
                             </th>
                             <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 Amount Paid
@@ -75,7 +82,7 @@
                                 onclick="openEditDailyLogModal({{ $dailyLog->id }})">
                                 <x-modals.edit-daily-log-modal :dailyLog="$dailyLog"/>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <img src="{{$dailyLog->member->photo_url ? $dailyLog->member->photo_url : asset('images/placeholder_profile.png')}}" class="w-12 h-12 rounded-full">
+                                    <img src="{{ $dailyLog->member->photo_url ? $dailyLog->member->photo_url : asset('images/default_avatar.png') }}" alt="Profile photo" class="h-12 w-12 rounded-full object-cover">
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                     <p class="text-gray-900 whitespace-no-wrap">
@@ -106,7 +113,12 @@
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                     <p class="text-gray-900 whitespace-no-wrap">
-                                        {{ $dailyLog->member_id ?? 'N/A' }}
+                                        {{ $dailyLog->member->white_noise_id ?? 'N/A' }}
+                                    </p>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <p class="text-gray-900 whitespace-no-wrap">
+                                        {{ $dailyLog->member->full_name ?? 'N/A' }}
                                     </p>
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -116,7 +128,9 @@
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                     <p class="text-gray-900 whitespace-no-wrap">
-                                        {{ $dailyLog->purpose_of_visit }}
+                                    @foreach ($dailyLog->purpose_of_visit as $purpose)
+                                        <li>{{ $purpose }}</li>
+                                        @endforeach
                                     </p>
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -124,6 +138,11 @@
                                         @foreach ($dailyLog->items_bought as $item)
                                         <li>{{ $item }}</li>
                                         @endforeach
+                                    </p>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <p class="text-gray-900 whitespace-no-wrap">
+                                        {{ $dailyLog->staff_assigned }}
                                     </p>
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">

@@ -21,6 +21,7 @@ class MemberFactory extends Factory
     public function definition(): array
     {
         return [
+            'white_noise_id' => fake()->uuid(),
             'full_name' => fake()->name(),
             'photo_url' => 'images/placeholder_profile.png',
             'membership_term_gym_access' => fake()->randomElement(['None', '1 month', '3 months', 'Walk in']),
@@ -44,7 +45,7 @@ class MemberFactory extends Factory
             'emergency_contact_number'=>fake()->phoneNumber(),
             'weight_kg'=>fake()->numberBetween(50, 200),
             'height_cm'=>fake()->numberBetween(150, 250),
-            'notes'=>fake()->text(),
+            'notes'=>'',
         ];
     }
 }
