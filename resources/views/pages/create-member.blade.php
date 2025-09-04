@@ -27,7 +27,7 @@
                         file:text-sm file:font-semibold
                         file:bg-gray-200 file:text-gray-700
                         hover:file:bg-gray-300"
-                        onchange="document.getElementById('photo-preview').src = window.URL.createObjectURL(this.files[0])" require>
+                        onchange="document.getElementById('photo-preview').src = window.URL.createObjectURL(this.files[0])" required>
                     </label>
                 </div>
                 @error('photo')
@@ -52,8 +52,8 @@
                     
                     <!-- Email -->
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
-                        <input type="email" id="email" name="email" required
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="text" id="email" name="email"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                value="{{ old('email') }}">
                         @error('email')
@@ -74,14 +74,10 @@
                     
                     <!-- Date of Birth -->
                     <div>
-                        <?php
-                            $minAge = 13;
-                            $maxDate = \Carbon\Carbon::now()->subYears($minAge)->format('Y-m-d');
-                        ?>
-                        <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth <span class="text-red-500">*</span></label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" required
+                        <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="{{ old('date_of_birth') }}"">
+                               value="{{ old('date_of_birth') }}">
                         @error('date_of_birth')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -119,7 +115,7 @@
                     <!-- ID Number -->
                     <div>
                         <label for="id_number" class="block text-sm font-medium text-gray-700 mb-1">ID Number <span class="text-red-500">*</span></label>
-                        <input type="number" id="id_number" name="id_number"
+                        <input type="text" id="id_number" name="id_number"
                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                value="{{ old('id_number') }}">
                         @error('id_number')
@@ -181,7 +177,8 @@
                     <div>
                         <label for="white_noise_id" class="block text-sm font-medium text-gray-700 mb-1">White Noise ID <span class="text-red-500">*</span></label>
                         <input type="text" id="white_noise_id" name="white_noise_id" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                value="{{ old('white_noise_id') }}">
                         @error('white_noise_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -189,7 +186,8 @@
                     <div>
                         <label for="member_type" class="block text-sm font-medium text-gray-700 mb-1">Member Type <span class="text-red-500">*</span></label>
                         <select id="member_type" name="member_type" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                value="{{ old('member_type') }}">
                             <option value="Student" {{ old('member_type') == 'Student' ? 'selected' : '' }}>Student</option>
                             <option value="Regular" {{ old('member_type') == 'Regular' ? 'selected' : '' }}>Regular</option>
                         </select>

@@ -78,11 +78,18 @@
                     </thead>
                     <tbody>
                         @foreach ($dailyLogs as $dailyLog)
+                            @if($dailyLog->white_noise_id != null)
                             <tr class="hover:bg-gray-50 cursor-pointer" 
                                 onclick="openEditDailyLogModal({{ $dailyLog->id }})">
                                 <x-modals.edit-daily-log-modal :dailyLog="$dailyLog"/>
+                            @else
+                            <tr class="hover:bg-gray-50 cursor-pointer" 
+                                onclick="openEditDayPassModal({{ $dailyLog->id }})">
+                                <x-modals.edit-day-pass-modal :dailyLog="$dailyLog"/>
+                            @endif
+
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <img src="{{ $dailyLog->member->photo_url ? $dailyLog->member->photo_url : asset('images/default_avatar.png') }}" alt="Profile photo" class="h-12 w-12 rounded-full object-cover">
+                                    <img src="{{ $dailyLog->member->photo_url ?? asset('images/default_avatar.png') }}" alt="Profile photo" class="h-12 w-12 rounded-full object-cover">
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                     <p class="text-gray-900 whitespace-no-wrap">
@@ -118,7 +125,7 @@
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                     <p class="text-gray-900 whitespace-no-wrap">
-                                        {{ $dailyLog->member->full_name ?? 'N/A' }}
+                                        {{ $dailyLog->member->full_name ?? $dailyLog->full_name ?? 'N/A'  }}
                                     </p>
                                 </td>
                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">

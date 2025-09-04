@@ -76,7 +76,7 @@
                 <tbody>
                     @foreach($members as $member)
                         <tr class="border-b border-gray-200 hover:bg-gray-100" onclick="window.location='{{ route('member-details.show', $member->id) }}'" style="transition: background-color 0.2s;">
-                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->id }}</td>
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->white_noise_id }}</td>
                             <td class="py-3 px-6 text-left whitespace-nowrap">
                                 @if($member->photo_url)
                                     <img src="{{ $member->photo_url }}" class="w-10 h-10 rounded-full object-cover">

@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('date');
             $table->time('time_in');
             $table->time('time_out')->nullable();
-            $table->string('white_noise_id');
+            $table->string('white_noise_id')->nullable();
             $table->foreign('white_noise_id')
                   ->references('white_noise_id')
                   ->on('members')
-                  ->onDelete('cascade');//or ->onDelete('set null');
+                  ->onDelete('set null');
             $table->string('full_name');
             $table->enum('payment_method', ['None', 'Cash', 'GCash', 'Bank Transfer']);
             $table->unsignedInteger('payment_amount');

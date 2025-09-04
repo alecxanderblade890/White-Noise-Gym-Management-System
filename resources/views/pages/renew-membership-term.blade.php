@@ -3,7 +3,7 @@
         <x-navigate-back :href="route('member-details.show', $member->id)">
             Back to Member Details
         </x-navigate-back>
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">Renew Membership Term for {{ $member->full_name }}</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Renew Gym Access for {{ $member->full_name }}</h1>
 
         <x-alert/>
 
@@ -14,12 +14,12 @@
                 <!-- Confirm Renewal Modal placed inside the same form -->
                 <x-modals.confirm-modal 
                     modalId="confirmRenewalTermModal"
-                    title="Confirm Membership Term Renewal"
-                    message="Are you sure you want to renew this membership term? Please enter staff password to confirm."
+                    title="Confirm Gym Access Renewal"
+                    message="Are you sure you want to renew this gym access? Please enter staff password to confirm."
                     :useSameForm="true"
                 />
             <div class="bg-white shadow-md rounded-lg p-6 mb-8">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Membership Term Renewal</h2>
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Gym Access Renewal</h2>
                 <div class="flex flex-wrap items-end gap-6 mb-6">
                     <!-- Member Type -->
                     <div class="w-40">
@@ -36,7 +36,7 @@
                     
                     <!-- Membership Term -->
                     <div class="w-48">
-                        <label for="membership_term_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Membership Term <span class="text-red-500">*</span></label>
+                        <label for="membership_term_gym_access" class="block text-sm font-medium text-gray-700 mb-1">Gym Access <span class="text-red-500">*</span></label>
                         <select id="membership_term_gym_access" name="membership_term_gym_access" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="None" {{ old('membership_term_gym_access', $member->membership_term_gym_access) == 'None' ? 'selected' : '' }}>None</option>
@@ -67,7 +67,7 @@
                 <div class="flex flex-wrap gap-6">
                     <!-- Membership Period -->
                     <div class="w-100">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Membership Term Period</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Gym Access Period</label>
                         <div class="flex items-center space-x-2">
                             <input type="hidden" id="current_end_date" value="{{ $member->gym_access_end_date ? $member->gym_access_end_date : null }}">
                             <input type="text" id="gym_access_start_date" readonly
@@ -82,7 +82,7 @@
                                 class="w-1/2 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
                                 value="">
                         </div>
-                        @error('payment_date_membership')
+                        @error('gym_access_end_date')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -91,7 +91,7 @@
                     <button type="button" 
                             onclick="document.getElementById('confirmRenewalTermModal').classList.remove('hidden')" 
                             class="bg-black hover:bg-gray-600 text-white py-2 px-4 rounded-md transition-colors duration-200">
-                        Renew Membership Term
+                        Renew Gym Access
                     </button>
                 </div>
             </div>

@@ -12,6 +12,9 @@ use App\Models\User;
 use App\Models\DailyLog;
 use App\Models\SalesReport;
 use Carbon\Carbon;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\Storage;
 
 class MemberController extends Controller
 {
@@ -74,11 +77,11 @@ class MemberController extends Controller
     {
         $rules = [
             'white_noise_id' => 'required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'photo' => $memberId ? 'nullable|image|mimes:jpeg,png,jpg,gif,heic|max:10240' : 'required|image|mimes:jpeg,png,jpg,gif,heic|max:10240',
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:members,email',
+            'email' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
-            'date_of_birth' => 'required|date|before:' . now()->subYears(13)->format('Y-m-d'),
+            'date_of_birth' => 'nullable|date',
             'weight_kg' => 'required|numeric|min:0',
             'height_cm' => 'required|numeric|min:0',
             'id_presented' => 'required|string|max:50',
@@ -98,30 +101,58 @@ class MemberController extends Controller
             'emergency_contact_number' => 'required|string|max:20',
             'notes' => 'nullable|string|max:500',
         ];
-
-        
-
         if ($memberId) {
-            $rules['email'] = 'required|email|max:255|unique:members,email,' . $memberId;
+            $rules['email'] = 'required|string|max:255';
             $rules['white_noise_id'] = 'required|string|max:255|unique:members,white_noise_id,' . $memberId;
         }
-
+        
         return Validator::make($request->all(), $rules);
     }
     public function addMember(Request $request)
     {
         try {
-
+            
             $validator = $this->validateMember($request);
 
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
-
+            
             $validated = $validator->validated();
-            $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
-                'folder' => 'members',
-            ]);
+            
+            // Check if photo exists and is valid
+            if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+                $photo = $request->file('photo');
+                $maxSize = 2 * 1024; // 2MB in KB
+                
+                // If file size is greater than 2MB, resize it
+                if ($photo->getSize() > $maxSize * 1024) {
+                    $manager = new ImageManager(new Driver());
+                    $image = $manager->read($photo->getRealPath());
+                    
+                    // Resize the image to a maximum width of 800px and constrain aspect ratio
+                    $image->scale(width: 800);
+                    
+                    // Save the resized image to a temporary file
+                    $tempPath = tempnam(sys_get_temp_dir(), 'photo_');
+                    $image->toJpeg(80)->save($tempPath);
+                    
+                    // Upload the resized image to Cloudinary
+                    $result = $this->cloudinary->uploadApi()->upload($tempPath, [
+                        'folder' => 'members',
+                    ]);
+                    
+                    // Clean up the temporary file
+                    unlink($tempPath);
+                } else {
+                    // If file size is within limit, upload directly
+                    $result = $this->cloudinary->uploadApi()->upload($photo->getRealPath(), [
+                        'folder' => 'members',
+                    ]);
+                }
+            } else {
+                throw new \Exception('Invalid or missing photo file');
+            }
 
             $membershipStartDate = $request->membership_start_date;
             $membershipEndDate = $request->membership_end_date;
@@ -129,7 +160,6 @@ class MemberController extends Controller
             $gymAccessEndDate = $request->gym_access_end_date;
             $ptStartDate = $request->pt_start_date;
             $ptEndDate = $request->pt_end_date;
-            
             
             // if ($validated['membership_term_gym_access'] === '1 month') {
             //     $validated['gym_access_start_date'] = $startDate->toDateString();
@@ -147,6 +177,29 @@ class MemberController extends Controller
 
             // Ensure with_pt value matches the ENUM case
             $withPt = $validated['with_pt'] === 'None' ? 'None' : '1 month';
+
+            $paymentHistory = []; // Initialize as an empty array
+
+            // Add the first payment
+            $paymentHistory[] = ['date' => $membershipStartDate, 'purpose' => 'New Membership', 'amount' => 500];
+
+            if($validated['gym_access_start_date'] !== null){
+                $amount = 0;
+                $purpose = '';
+                if($validated['membership_term_gym_access'] === '1 month'){
+                    $purpose = 'Gym Access 1 month';
+                    $amount = (int) $validated['membership_term_billing_rate'];
+                }
+                else if($validated['membership_term_gym_access'] === '3 months'){
+                    $purpose = 'Gym Access 3 months';
+                    $amount = (int) $validated['membership_term_billing_rate'];
+                }
+                $paymentHistory[] = ['date' => $gymAccessStartDate, 'purpose' => $purpose, 'amount' => $amount];
+            }
+
+            if($validated['pt_start_date'] !== null && $validated['with_pt'] === '1 month'){
+                $paymentHistory[] = ['date' => $ptStartDate, 'purpose' => 'Personal Training 1 month', 'amount' => (int) $validated['with_pt_billing_rate']];
+            }
             
             Member::create([
                 'white_noise_id' => $validated['white_noise_id'],
@@ -154,7 +207,7 @@ class MemberController extends Controller
                 'full_name' => $validated['full_name'],
                 'email' => $validated['email'],
                 'phone_number' => $validated['phone_number'],
-                'date_of_birth' => $validated['date_of_birth'],
+                'date_of_birth' => $validated['date_of_birth'] ?? null,
                 'weight_kg' => $validated['weight_kg'],
                 'height_cm' => $validated['height_cm'],
                 'id_presented' => $validated['id_presented'],
@@ -174,6 +227,7 @@ class MemberController extends Controller
                 'emergency_contact_person' => $validated['emergency_contact_person'],
                 'emergency_contact_number' => $validated['emergency_contact_number'],
                 'notes' => $validated['notes'] ?? null,
+                'payment_history' => json_encode($paymentHistory),
             ]);
 
         } catch (ValidationException $e) {
@@ -195,12 +249,43 @@ class MemberController extends Controller
 
                 $validated = $validator->validated();
 
-                if ($request->hasFile('photo')) {
-                    $result = $this->cloudinary->uploadApi()->upload($request->file('photo')->getRealPath(), [
-                        'folder' => 'members',
-                    ]);
-                    $validated['photo_url'] = $result['secure_url'];
+                 // Check if photo exists and is valid
+                if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+                    $photo = $request->file('photo');
+                    $maxSize = 2 * 1024; // 2MB in KB
+                    
+                    // If file size is greater than 2MB, resize it
+                    if ($photo->getSize() > $maxSize * 1024) {
+                        $manager = new ImageManager(new Driver());
+                        $image = $manager->read($photo->getRealPath());
+                        
+                        // Resize the image to a maximum width of 800px and constrain aspect ratio
+                        $image->scale(width: 800);
+                        
+                        // Save the resized image to a temporary file
+                        $tempPath = tempnam(sys_get_temp_dir(), 'photo_');
+                        $image->toJpeg(80)->save($tempPath);
+                        
+                        // Upload the resized image to Cloudinary
+                        $result = $this->cloudinary->uploadApi()->upload($tempPath, [
+                            'folder' => 'members',
+                        ]);
+                        
+                        // Update the photo URL in the validated data
+                        $validated['photo_url'] = $result['secure_url'];
+                        
+                        // Clean up the temporary file
+                        unlink($tempPath);
+                    } else {
+                        // If file size is within limit, upload directly
+                        $result = $this->cloudinary->uploadApi()->upload($photo->getRealPath(), [
+                            'folder' => 'members',
+                        ]);
+                        $validated['photo_url'] = $result['secure_url'];
+                    }
                 }
+                // Remove the photo from validated data if no new photo was uploaded
+                unset($validated['photo']);
                 
                 // Ensure with_pt value matches the ENUM case
                 if (isset($validated['with_pt'])) {
@@ -257,49 +342,17 @@ class MemberController extends Controller
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('id', 'LIKE', "%{$search}%")
+                $q->where('white_noise_id', 'LIKE', "%{$search}%")
                   ->orWhere('full_name', 'LIKE', "%{$search}%");
             });
         }
         
         $members = $query->orderBy('id', 'desc')->paginate(10);
     
-    // If it's an AJAX request (for future implementation)
-    if ($request->ajax()) {
-        return response()->json($members);
-    }
-    
-    return view('pages.members', compact('members'));
-    }
-    public function salesReportEntry($date, $request)
-    {
-        $salesReport = SalesReport::where('date', $date)->first();
-        
-        if($salesReport){
-            //update
+        if ($request->ajax()) {
+            return response()->json($members);
         }
-        else{
-
-            SalesReport::create([
-                'date' => $date,
-                'memberships_only' => 1,
-                'walk_in_regular_on_sign_up' => 0,
-                'walk_in_student_on_sign_up' => 0,
-                'personal_trainer_on_sign_up' => 0,
-                '1_month_regular' => 0,
-                '1_month_student' => 0,
-                '3_months_regular' => 0,
-                '3_months_student' => 0,
-                'walk_in_regular' => 0,
-                'walk_in_student' => 0,
-                'gym_access_1_month_regular' => 0,
-                'gym_access_1_month_student' => 0,
-                'gym_access_3_months_regular' => 0,
-                'gym_access_3_months_student' => 0,
-                'personal_trainer_1_month' => 0,
-                'personal_trainer_walk_in' => 0,
-                'total_sales' => 0,
-            ]);
-        }        
+    
+        return view('pages.members', compact('members'));
     }
 }

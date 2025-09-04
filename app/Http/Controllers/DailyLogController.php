@@ -37,27 +37,39 @@ class DailyLogController extends Controller
                 'items' => 'nullable|array',
                 'notes' => 'nullable|string'
             ]); 
-            
             // Get the member first
             $member = Member::where('white_noise_id', $validated['white_noise_id_form'])->first();
 
-            // if($member->gym_access_start_date != null){
-            //     // Check if member's gym access has expired
-            //     $today = now()->startOfDay();
-            //     $gymAccessEndDate = $member->gym_access_end_date ? \Carbon\Carbon::parse($member->gym_access_end_date)->startOfDay() : null;
-            //     $membershipEndDate = $member->membership_end_date ? \Carbon\Carbon::parse($member->membership_end_date)->startOfDay() : null;
+            $today = now()->startOfDay();
+
+            if(!in_array('Membership Payment', $validated['purpose_of_visit']) &&
+                !in_array('Renew Membership', $validated['purpose_of_visit']) && 
+                !in_array('Gym Access Payment', $validated['purpose_of_visit']) && 
+                !in_array('Renew Gym Access', $validated['purpose_of_visit']) && 
+                !in_array('Personal Trainer Payment', $validated['purpose_of_visit']) && 
+                !in_array('Renew Personal Trainer', $validated['purpose_of_visit'])){
+
+                // Check gym access if it exists
+                if ($member->gym_access_end_date) {
+                    $gymAccessEndDate = \Carbon\Carbon::parse($member->gym_access_end_date)->startOfDay();
+                    if ($today->gt($gymAccessEndDate)) {
+                        return redirect()->back()
+                            ->with('error', "This member's gym access term has expired. Please renew to proceed.")
+                            ->withInput();
+                    }
+                }
                 
-            //     if (!$gymAccessEndDate || $today->gt($gymAccessEndDate)) {
-            //         return redirect()->back()
-            //             ->with('error', "This member's gym access term has expired. Please renew to proceed.")
-            //             ->withInput();
-            //     }
-            //     else if (!$membershipEndDate || $today->gt($membershipEndDate)) {
-            //         return redirect()->back()
-            //             ->with('error', "This member's membership has expired. Please renew to proceed.")
-            //             ->withInput();
-            //     }
-            // }
+                // Check membership if it exists
+                if ($member->membership_end_date) {
+                    $membershipEndDate = \Carbon\Carbon::parse($member->membership_end_date)->startOfDay();
+                    if ($today->gt($membershipEndDate)) {
+                        return redirect()->back()
+                            ->with('error', "This member's membership has expired. Please renew to proceed.")
+                            ->withInput();
+                    }
+                }
+                
+            }
 
             $upgradeGymAccess = $validated['upgrade_gym_access'] ? 1 : 0;
 
@@ -94,38 +106,10 @@ class DailyLogController extends Controller
             $isRenewMembership = in_array('Renew Membership', $purposeOfVisit);
             $isRenewGymAccess = in_array('Renew Gym Access', $purposeOfVisit);
             $isRenewPT = in_array('Renew Personal Trainer', $purposeOfVisit);
+            $isRemoveGymAccess = in_array('Remove Gym Access', $purposeOfVisit);
+            $isRemovePT = in_array('Remove Personal Trainer', $purposeOfVisit);
 
-            if ($validated['gym_access'] == 'None') {
-                $member->update([
-                    'gym_access_start_date' => null,
-                    'gym_access_end_date' => null,
-                ]);
-            }
-            else if ($isGymAccess && $validated['gym_access'] == '1 month') {
-                $member->update([
-                    'gym_access_start_date' => now()->toDateString(),
-                    'gym_access_end_date' => Carbon::parse($member->gym_access_end_date)->addDays(30)->toDateString(),
-                ]);
-            }
-            else if ($isGymAccess && $validated['gym_access'] == '3 months') {
-                $member->update([
-                    'gym_access_start_date' => now()->toDateString(),
-                    'gym_access_end_date' => Carbon::parse($member->gym_access_end_date)->addDays(90)->toDateString(),
-                ]);
-            }
-            else if ($isGymAccess && $validated['gym_access'] == 'Walk in') {
-                $member->update([
-                    'gym_access_start_date' => now()->toDateString(),
-                    'gym_access_end_date' => null,
-                ]);
-            }
-
-            if ($isPersonalTrainer) {
-                $member->update([
-                    'pt_start_date' => now()->toDateString(),
-                    'pt_end_date' => Carbon::parse($member->pt_end_date)->addDays(365)->toDateString(),
-                ]);
-            }
+            $paymentHistory = json_decode($member->payment_history, true) ?? [];
 
             if ($isRenewMembership) {
                 $member->update([
@@ -133,51 +117,77 @@ class DailyLogController extends Controller
                     'membership_end_date' => Carbon::parse($member->membership_end_date)->addDays(365)->toDateString(),
                 ]);
             }
-            
-            else if($validated['gym_access'] == 'Walk in' && $isRenewGymAccess){
+
+            // Handle gym access updates
+            if ($validated['gym_access'] === 'None' && $isRemoveGymAccess) {
                 $member->update([
-                    'gym_access_start_date' => now()->toDateString(),
+                    'gym_access_start_date' => null,
                     'gym_access_end_date' => null,
                 ]);
-            }
-            else if($validated['gym_access'] == '1 month' && $isRenewGymAccess){
-                $currentEndDate = $member->gym_access_end_date ? Carbon::parse($member->gym_access_end_date) : null;
-                $isExpired = !$currentEndDate || $currentEndDate->isPast();
+            } 
+            // Handle new gym access or renewals
+            elseif ($isGymAccess || $isRenewGymAccess) {
+                $updates = ['gym_access_start_date' => now()->toDateString()];
                 
-                $member->update([
-                    'gym_access_start_date' => now()->toDateString(),
-                    'gym_access_end_date' => $isExpired 
-                        ? now()->addDays(30)->toDateString() 
-                        : $currentEndDate->addDays(30)->toDateString(),
-                ]);
-            }
-            else if($validated['gym_access'] == '3 months' && $isRenewGymAccess){
-                $currentEndDate = $member->gym_access_end_date ? Carbon::parse($member->gym_access_end_date) : null;
-                $isExpired = !$currentEndDate || $currentEndDate->isPast();
+                if ($validated['gym_access'] === 'Walk in') {
+                    $updates['gym_access_end_date'] = null;
+                } else {
+                    $daysToAdd = $validated['gym_access'] === '1 month' ? 30 : 90;
+                    $currentEndDate = $member->gym_access_end_date ? Carbon::parse($member->gym_access_end_date) : null;
+                    $isExpired = !$currentEndDate || $currentEndDate->isPast();
+                    
+                    $updates['gym_access_end_date'] = $isExpired
+                        ? now()->addDays($daysToAdd)->toDateString()
+                        : $currentEndDate->addDays($daysToAdd)->toDateString();
+                }
+
+                $newPaymentPurpose = '';
+                $newPaymentAmount = 0;
+
+                if($validated['gym_access'] === '1 month'){
+                    $newPaymentPurpose = 'Gym Access 1 month';
+                    $newPaymentAmount = $validated['member_type'] === 'Student' ? 1000: 1500; // Example amount for 1 month
+                }
+                else if($validated['gym_access'] === '3 months'){
+                    $newPaymentPurpose = 'Gym Access 3 months';
+                    $newPaymentAmount = $validated['member_type'] === 'Student' ? 2500: 4500; // Example amount for 3 months
+                }
+                $newPayment = [
+                    'date' => now()->toDateString(), // Use the current date
+                    'purpose' => $newPaymentPurpose,
+                    'amount' => (int) $newPaymentAmount,
+                ];
+
+                // Append the new payment to the array
+                $paymentHistory[] = $newPayment;
+                // Re-encode the array back to JSON and add it to the validated data
+                $updates['payment_history'] = json_encode($paymentHistory);
                 
-                $member->update([
-                    'gym_access_start_date' => now()->toDateString(),
-                    'gym_access_end_date' => $isExpired 
-                        ? now()->addDays(90)->toDateString() 
-                        : $currentEndDate->addDays(90)->toDateString(),
-                ]);
+                $member->update($updates);
             }
             
-            if($validated['personal_trainer'] == 'None' && $isRenewPT){
+            if($validated['personal_trainer'] == 'None' && $isRemovePT){
                 $member->update([
                     'pt_start_date' => null,
                     'pt_end_date' => null,
                 ]);
             }
-            else if($validated['personal_trainer'] == '1 month' && $isRenewPT){
+            else if($validated['personal_trainer'] == '1 month' && ($isRenewPT || $isPersonalTrainer)){
                 $currentEndDate = $member->pt_end_date ? Carbon::parse($member->pt_end_date) : null;
                 $isExpired = !$currentEndDate || $currentEndDate->isPast();
+
+                $paymentHistory[] = [
+                    'date' => now()->toDateString(),
+                    'purpose' => 'Personal Trainer 1 month',
+                    'amount' => 3000, // Example amount for PT
+                ];
                 
                 $member->update([
                     'pt_start_date' => now()->toDateString(),
                     'pt_end_date' => $isExpired 
                         ? now()->addDays(30)->toDateString() 
                         : $currentEndDate->addDays(30)->toDateString(),
+                    'payment_history' => json_encode($paymentHistory),
                 ]);
             }
 
@@ -191,6 +201,50 @@ class DailyLogController extends Controller
             return redirect()->back()->with('error', 'Failed to add daily log: ' . $e->getMessage());
         }
         return redirect()->route('get-daily-logs')->with('success', 'Daily log added successfully!');
+    }
+    public function addDailyLogDayPass(Request $request){
+        try {
+            $validated = $request->validate([
+                'date_day_pass' => 'required|date',
+                'full_name_day_pass' => 'required|string',
+                'time_in_day_pass' => 'required|date_format:H:i',
+                'time_out_day_pass' => 'nullable|date_format:H:i',
+                'payment_method_day_pass' => 'required|in:None,Cash,GCash,Bank Transfer',
+                'payment_amount_day_pass' => 'required|integer|min:0',
+                'staff_assigned_day_pass' => 'required|string',
+            ]);
+
+            $items = $request->input('items_day_pass', []);
+            $tShirts = $request->input('t_shirts_day_pass', []);
+            
+            // Combine items and t-shirts into a single array for storage
+            $allItems = array_merge($items, $tShirts);
+            
+            // Remove duplicate items and reindex array
+            $allItems = array_values(array_unique($allItems));
+
+            DailyLog::create([
+                'date' => $validated['date_day_pass'],
+                'time_in' => $validated['time_in_day_pass'],
+                'time_out' => $validated['time_out_day_pass'] ?? null,
+                'white_noise_id' => null,
+                'full_name' => $validated['full_name_day_pass'],
+                'payment_method' => $validated['payment_method_day_pass'],
+                'payment_amount' => $validated['payment_amount_day_pass'],
+                'purpose_of_visit' => ['Gym Use (Day Pass)'],
+                'staff_assigned' => $validated['staff_assigned_day_pass'],
+                'upgrade_gym_access' => false,
+                'notes' => '',
+                'items_bought' => $allItems,
+                'member_type' => 'Regular',
+                'gym_access' => 'None',
+                'personal_trainer' => 'None'
+            ]);
+            return redirect()->route('get-daily-logs')->with('success', 'Daily log added successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to add daily log: ' . $e->getMessage());
+        }
     }
     public function getDailyLogs()
     {
@@ -297,8 +351,59 @@ class DailyLogController extends Controller
         }
     }   
 
-    public function deleteDailyLog(Request $request, $id)
-    {
+    public function updateDailyLogDayPass(Request $request, $id){
+        try {
+            $validated = $request->validate([
+                'date_day_pass' => 'required|date',
+                'time_in_day_pass' => 'required|date_format:H:i',
+                'time_out_day_pass' => 'nullable|date_format:H:i',
+                'full_name_day_pass' => 'required|string|max:255',
+                'payment_method_day_pass' => 'required|in:None,Cash,GCash,Bank Transfer',
+                'payment_amount_day_pass' => 'required|integer|min:0',
+                'staff_assigned_day_pass' => 'required|string|max:255',
+                'items_day_pass' => 'nullable|array',
+                't_shirts_day_pass' => 'nullable|array',
+                'notes_day_pass' => 'nullable|string',
+            ]);
+
+            $staffUser = User::where('username', 'staff_access')->first();
+
+            // Verify staff password using Hash::check to compare against hashed password
+            if (!$staffUser || $request->password !== $staffUser->password) {
+                return redirect()->back()->with('error', 'Incorrect staff password. Update cancelled.');
+            }
+
+            $dailyLog = DailyLog::findOrFail($id);
+            $items = $request->input('items_day_pass', []);
+            $tShirts = $request->input('t_shirts_day_pass', []);
+            
+            // Combine items and t-shirts into a single array for storage
+            $allItems = array_merge($items, $tShirts);
+            
+            // Remove duplicate items and reindex array
+            $allItems = array_values(array_unique($allItems));
+
+            $dailyLog->update([
+                'date' => $validated['date_day_pass'],
+                'time_in' => $validated['time_in_day_pass'],
+                'time_out' => $validated['time_out_day_pass'] ?? null,
+                'full_name' => $validated['full_name_day_pass'],
+                'payment_method' => $validated['payment_method_day_pass'],
+                'payment_amount' => $validated['payment_amount_day_pass'],
+                'purpose_of_visit' => ['Gym Use (Day Pass)'],
+                'staff_assigned' => $validated['staff_assigned_day_pass'],
+                'notes' => $validated['notes_day_pass'],
+                'items_bought' => $allItems,
+            ]);
+
+            return redirect()->route('get-daily-logs')->with('success', 'Daily log updated successfully!');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update daily log: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteDailyLog(Request $request, $id){
         $request->validate([
             'password' => 'required|string',
         ]);
@@ -335,4 +440,3 @@ class DailyLogController extends Controller
         return redirect()->route('get-daily-logs')->with('success', 'Time out updated successfully!');
     }
 }
-

@@ -1,4 +1,5 @@
 <x-layout>
+    <x-modals.day-pass-modal/>
     <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">{{Auth::user()->username == 'admin_access' ? 'Admin Dashboard' : 'Staff Dashboard'}}</h1>
         <div class="bg-white shadow-md rounded-lg p-6 mb-8">
@@ -7,7 +8,6 @@
                     <div class="flex space-x-2">
                         <span>Total Sales Today: <span class="text-gray-700">₱ {{number_format($totalSalesToday, 2)}}</span></span>
                     </div>
-
                     <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
@@ -29,30 +29,26 @@
                     </div>
                     <div class="mt-4 space-y-2 transform-gpu origin-top scale-y-0 opacity-0 transition-all duration-300 ease-in-out group-open:scale-y-100 group-open:opacity-100">
                         <div class="flex text-gray-700">
+                            <span>New/Renewal Memberships Today:</span>
+                            <span class="font-medium ml-2">₱ {{ number_format($totalNewMemberships * 500, 2)}} ({{$totalNewMemberships}}) </span>
+                        </div>
+                        <div class="flex text-gray-700">
+                            <span>New/Renewal Gym Access Today:</span>
+                            <span class="font-medium ml-2">₱ {{ number_format($totalNewGymAccessAmount, 2)}} ({{$totalNewGymAccess}}) </span>
+                        </div>
+                        <div class="flex text-gray-700">
+                            <span>New/Renewal Personal Trainer Today:</span>
+                            <span class="font-medium ml-2">₱ {{ number_format($totalNewPersonalTrainer * 3000, 2)}} ({{$totalNewPersonalTrainer}}) </span>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-2 transform-gpu origin-top scale-y-0 opacity-0 transition-all duration-300 ease-in-out group-open:scale-y-100 group-open:opacity-100">
+                        <div class="flex text-gray-700">
                             <span>Total Clients Today:</span>
                             <span class="font-medium ml-2">{{ $totalClientsToday }}</span>
                         </div>
                         <div class="flex text-gray-700">
                             <span>Total Items Sold Today:</span>
-                            <span class="font-medium ml-2">₱ {{ number_format($gcashTotal, 2) }}</span>
-                        </div>
-                        <div class="flex text-gray-700">
-                            <span>Total Memberships Today:</span>
-                            <span class="font-medium ml-2">₱ {{ number_format($bankTransferTotal, 2) }}</span>
-                        </div>
-                    </div>
-                    <div class="mt-4 space-y-2 transform-gpu origin-top scale-y-0 opacity-0 transition-all duration-300 ease-in-out group-open:scale-y-100 group-open:opacity-100">
-                        <div class="flex text-gray-700">
-                            <span>New Memberships Today:</span>
-                            <span class="font-medium ml-2">₱ {{ number_format($cashTotal, 2) }}</span>
-                        </div>
-                        <div class="flex text-gray-700">
-                            <span>New Gym Access Today:</span>
-                            <span class="font-medium ml-2">₱ {{ number_format($gcashTotal, 2) }}</span>
-                        </div>
-                        <div class="flex text-gray-700">
-                            <span>New Personal Trainer Today:</span>
-                            <span class="font-medium ml-2">₱ {{ number_format($bankTransferTotal, 2) }}</span>
+                            <span class="font-medium ml-2">₱ {{ number_format($totalItemsSalesAmount, 2)}} ({{$totalItemsSalesCount}}) </span>
                         </div>
                     </div>
                 </div>
@@ -85,6 +81,15 @@
                             </svg>
                             Validate Member ID
                         </button>
+                        <button type="button" 
+                                id="day-pass-btn"
+                                class="inline-flex items-center justify-center ml-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-black hover:bg-black/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/80">
+                            <svg id="day-pass-spinner" class="hidden -ml-1 mr-2 h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Day Pass
+                        </button>
                     </div>
                     <label id="label_text" class="text-sm"></label>
                     <div id="daily-log-form" class="hidden">
@@ -106,7 +111,7 @@
                                     <label for="time_in" class="block text-sm font-medium text-gray-700 mb-1">Time in<span class="text-red-500">*</span></label>
                                     <input type="time" id="time_in" name="time_in" required
                                         class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black"
-                                        value="{{ date('H:i', time());}}">
+                                        value="{{ date('H:i', time()) }}">
                                     @error('time_in')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -116,7 +121,7 @@
                                     <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name<span class="text-red-500">*</span></label>
                                     <input type="text" id="full_name" name="full_name" readonly
                                         class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black"
-                                        value="{{ old('full_name') }}">
+                                        value="">
                                     @error('full_name')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -241,6 +246,14 @@
                                         <div class="flex items-center">
                                             <input type="checkbox" id="pt_1_day" name="purpose_of_visit[]" value="Personal Trainer 1 Day" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded">
                                             <label for="pt_1_day" class="ml-2 block text-sm text-gray-700">Personal Trainer 1 Day</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="remove_gym_access" name="purpose_of_visit[]" value="Remove Gym Access" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded">
+                                            <label for="remove_gym_access" class="ml-2 block text-sm text-gray-700">Remove Gym Access</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="remove_pt" name="purpose_of_visit[]" value="Remove Personal Trainer" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded">
+                                            <label for="remove_pt" class="ml-2 block text-sm text-gray-700">Remove Personal Trainer</label>
                                         </div>
                                     </div>
                                 </div>
@@ -380,7 +393,7 @@
                             @endphp
                                 <tr class="hover:bg-gray-50 transition-colors text-center">
                                     <td class="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ $member->id }}
+                                        {{ $member->white_noise_id }}
                                     </td>
                                     <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
                                         <div class="font-semibold">{{ $member->full_name }}</div>
@@ -398,9 +411,9 @@
                                         <br>
                                         <p class="font-medium {{ $member->membership_start_date != null ? ($isActiveMembership ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">
                                         @if($member->membership_start_date != null && $isActiveMembership)
-                                            ({{ (int)abs(\Carbon\Carbon::parse($member->membership_end_date)->addDay()->diffInDays(now())) }} days remaining)
+                                            ({{ (int)abs(\Carbon\Carbon::parse($member->membership_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                         @elseif($member->membership_start_date != null && !$isActiveMembership)
-                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} days ago)
+                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} day/s ago)
                                         @endif
                                         </p>
                                     </td>
@@ -411,9 +424,9 @@
                                         <br>
                                         <p class="font-medium {{ $member->gym_access_start_date != null ? ($isActiveGymAccess ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">
                                         @if($member->gym_access_start_date != null && $isActiveGymAccess)
-                                            ({{ (int)abs(\Carbon\Carbon::parse($member->gym_access_end_date)->addDay()->diffInDays(now())) }} days remaining)
+                                            ({{ (int)abs(\Carbon\Carbon::parse($member->gym_access_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                         @elseif($member->gym_access_start_date != null && !$isActiveGymAccess)
-                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} days ago)
+                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} day/s ago)
                                         @endif
                                         </p>
                                     </td>
@@ -424,9 +437,9 @@
                                         <br>
                                         <p class="font-medium {{ $member->pt_start_date != null ? ($isActivePT ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">  
                                         @if($member->pt_start_date != null && $isActivePT)
-                                            ({{ (int)abs(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now())) }} days remaining)
+                                            ({{ (int)abs(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                         @elseif($member->pt_start_date != null && !$isActivePT)
-                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} days ago)
+                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} day/s ago)
                                         @endif
                                         </p>
                                     </td>
@@ -484,9 +497,9 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse ($membersExpired as $member)
                             @php
-                                $isMembershipExpired = $member->membership_end_date && $member->membership_end_date < now();
-                                $isGymAccessExpired = $member->gym_access_end_date && $member->gym_access_end_date < now();
-                                $isPTExpired = $member->pt_end_date && $member->pt_end_date < now();
+                                $isMembershipExpired = $member->membership_end_date < now();
+                                $isGymAccessExpired = $member->gym_access_end_date ? $member->gym_access_end_date < now() : false;
+                                $isPTExpired = $member->pt_end_date ? $member->pt_end_date < now() : false;
                                 
                                 $expiredMemberships = [];
                                 if ($isMembershipExpired) $expiredMemberships[] = 'Membership';
@@ -495,7 +508,7 @@
                             @endphp
                                 <tr class="hover:bg-gray-50 transition-colors text-center">
                                     <td class="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ $member->id }}
+                                        {{ $member->white_noise_id }}
                                     </td>
                                     <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
                                         <div class="font-semibold">{{ $member->full_name }}</div>
@@ -514,11 +527,11 @@
                                         @if($member->membership_start_date != null)
                                             @if($isMembershipExpired)
                                                 <span class="font-medium text-red-600">
-                                                    (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} days ago)
+                                                    (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} day/s ago)
                                                 </span>
                                             @else
                                                 <span class="font-medium text-green-600">
-                                                    ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) + 1 }} days remaining)
+                                                    ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date)))}} day/s remaining)
                                                 </span>
                                             @endif
                                         @endif
@@ -532,11 +545,11 @@
                                         @if($member->gym_access_start_date != null)
                                             @if($isGymAccessExpired)
                                                 <span class="font-medium text-red-600">
-                                                    (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} days ago)
+                                                    (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} day/s ago)
                                                 </span>
                                             @else
                                                 <span class="font-medium text-green-600">
-                                                    ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) + 1 }} days remaining)
+                                                    ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date)))}} day/s remaining)
                                                 </span>
                                             @endif
                                         @endif
@@ -550,11 +563,11 @@
                                         @if($member->pt_start_date != null)
                                             @if($isPTExpired)
                                                 <span class="font-medium text-red-600">
-                                                    (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} days ago)
+                                                    (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} day/s ago)
                                                 </span>
                                             @else
                                                 <span class="font-medium text-green-600">
-                                                    ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) + 1 }} days remaining)
+                                                    ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date)))}} day/s remaining)
                                                 </span>
                                             @endif
                                         @endif

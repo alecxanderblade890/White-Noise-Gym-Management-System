@@ -113,12 +113,12 @@
                                     <div class="space-y-2 mb-4">
                                         <div class="flex items-center">
                                             <input type="radio" id="member_type_regular" name="member_type" value="Regular" class="h-4 w-4 text-black focus:ring-black border-gray-300"
-                                                {{ $dailyLog->member->member_type == 'Regular' ? 'checked' : '' }}>
+                                                {{ $dailyLog->member && $dailyLog->member->member_type ? ($dailyLog->member->member_type == 'Regular' ? 'checked' : '') : '' }}>
                                             <label for="member_type_regular" class="ml-2 block text-sm text-gray-700">Regular</label>
                                         </div>
                                         <div class="flex items-center">
                                             <input type="radio" id="member_type_student" name="member_type" value="Student" class="h-4 w-4 text-black focus:ring-black border-gray-300"
-                                                {{ $dailyLog->member->member_type == 'Student' ? 'checked' : '' }}>
+                                                {{ $dailyLog->member && $dailyLog->member->member_type ? ($dailyLog->member->member_type == 'Student' ? 'checked' : '') : '' }}>
                                             <label for="member_type_student" class="ml-2 block text-sm text-gray-700">Student</label>
                                         </div>
                                     </div>
@@ -126,22 +126,22 @@
                                     <div class="space-y-2 mb-4">
                                         <div class="flex items-center">
                                             <input type="radio" id="gym_access_none" name="gym_access" value="None" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
-                                                {{ $dailyLog->member->membership_term_gym_access == 'None' ? 'checked' : '' }}>
+                                                {{ $dailyLog->member && $dailyLog->member->membership_term_gym_access ? ($dailyLog->member->membership_term_gym_access == 'None' ? 'checked' : '') : '' }}>
                                             <label for="gym_access_none" class="ml-2 block text-sm text-gray-700">None</label>
                                         </div>
                                         <div class="flex items-center">
                                             <input type="radio" id="gym_access_1_month" name="gym_access" value="1 month" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
-                                                {{ $dailyLog->member->membership_term_gym_access == '1 month' ? 'checked' : '' }}>
+                                                {{ $dailyLog->member && $dailyLog->member->membership_term_gym_access ? ($dailyLog->member->membership_term_gym_access == '1 month' ? 'checked' : '') : '' }}>
                                             <label for="gym_access_1_month" class="ml-2 block text-sm text-gray-700">1 Month</label>
                                         </div>
                                         <div class="flex items-center">
                                             <input type="radio" id="gym_access_3_month" name="gym_access" value="3 months" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
-                                                {{ $dailyLog->member->membership_term_gym_access == '3 months' ? 'checked' : '' }}>
+                                                {{ $dailyLog->member && $dailyLog->member->membership_term_gym_access ? ($dailyLog->member->membership_term_gym_access == '3 months' ? 'checked' : '') : '' }}>
                                             <label for="gym_access_3_month" class="ml-2 block text-sm text-gray-700">3 Months</label>
                                         </div>
                                         <div class="flex items-center">
                                             <input type="radio" id="gym_access_walk_in" name="gym_access" value="Walk in" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
-                                                {{ $dailyLog->member->membership_term_gym_access == 'Walk in' ? 'checked' : '' }}>
+                                                {{ $dailyLog->member && $dailyLog->member->membership_term_gym_access ? ($dailyLog->member->membership_term_gym_access == 'Walk in' ? 'checked' : '') : '' }}>
                                             <label for="gym_access_walk_in" class="ml-2 block text-sm text-gray-700">Walk in</label>
                                         </div>
                                     </div>
@@ -149,12 +149,12 @@
                                     <div class="space-y-2">
                                         <div class="flex items-center">
                                             <input type="radio" id="personal_trainer_none" name="personal_trainer" value="None" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
-                                                {{ $dailyLog->member->with_pt == 'None' ? 'checked' : '' }}>
+                                                {{ $dailyLog->member && $dailyLog->member->with_pt ? ($dailyLog->member->with_pt == 'None' ? 'checked' : '') : '' }}>
                                             <label for="personal_trainer_none" class="ml-2 block text-sm text-gray-700">None</label>
                                         </div>
                                         <div class="flex items-center">
                                             <input type="radio" id="personal_trainer_1_month" name="personal_trainer" value="1 month" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
-                                                {{ $dailyLog->member->with_pt == '1 month' ? 'checked' : '' }}>
+                                                {{ $dailyLog->member && $dailyLog->member->with_pt ? ($dailyLog->member->with_pt == '1 month' ? 'checked' : '') : '' }}>
                                             <label for="personal_trainer_1_month" class="ml-2 block text-sm text-gray-700">1 Month</label>
                                         </div>
                                     </div>
@@ -202,6 +202,16 @@
                                             <input type="checkbox" id="pt_1_day" name="purpose_of_visit[]" value="Personal Trainer 1 Day" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
                                                 {{ in_array('Personal Trainer 1 Day', $dailyLog->purpose_of_visit) ? 'checked' : '' }}>
                                             <label for="pt_1_day" class="ml-2 block text-sm text-gray-700">Personal Trainer 1 Day</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="remove_gym_access" name="purpose_of_visit[]" value="Remove Gym Access" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
+                                                {{ in_array('Remove Gym Access', $dailyLog->purpose_of_visit) ? 'checked' : '' }}>
+                                            <label for="remove_gym_access" class="ml-2 block text-sm text-gray-700">Remove Gym Access</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="remove_pt" name="purpose_of_visit[]" value="Remove Personal Trainer" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
+                                                {{ in_array('Remove Personal Trainer', $dailyLog->purpose_of_visit) ? 'checked' : '' }}>
+                                            <label for="remove_pt" class="ml-2 block text-sm text-gray-700">Remove Personal Trainer</label>
                                         </div>
                                     </div>
                                 </div>

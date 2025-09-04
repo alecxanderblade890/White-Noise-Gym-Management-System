@@ -85,7 +85,7 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Date of Birth</p>
-                                <p class="font-medium">{{ \Carbon\Carbon::parse($member->date_of_birth)->format('F j, Y') }} ({{ \Carbon\Carbon::parse($member->date_of_birth)->age }} years old)</p>
+                                <p class="font-medium">{{ $member->date_of_birth ? \Carbon\Carbon::parse($member->date_of_birth)->format('F j, Y') . ' (' . \Carbon\Carbon::parse($member->date_of_birth)->age . ' years old)' : 'N/A' }} </p>
                             </div>
                         </div>
 
@@ -106,7 +106,7 @@
                         <div class="space-y-4">
                             <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Membership Details</h2>
                             <div>
-                                <p class="text-sm text-gray-500">Membership Term</p>
+                                <p class="text-sm text-gray-500">Gym Access</p>
                                 <p class="font-medium">{{ $member->membership_term_gym_access == 'none' ? 'None' : $member->membership_term_gym_access }}</p>
                             </div>
                             <div>
@@ -118,9 +118,9 @@
                                 <p class="font-medium {{ $isActiveMembership ? 'text-green-600' : 'text-red-600' }}">
                                     {{ \Carbon\Carbon::parse($member->membership_end_date)->format('F j, Y') }}
                                     @if($isActiveMembership)
-                                        ({{ (int)abs(\Carbon\Carbon::parse($member->membership_end_date)->addDay()->diffInDays(now())) }} days remaining)
+                                        ({{ (int)abs(\Carbon\Carbon::parse($member->membership_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                     @else
-                                        (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} days ago)
+                                        (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} day/s ago)
                                     @endif
                                 </p>
                             </div>
@@ -134,9 +134,9 @@
                                     <p class="font-medium {{ $isActiveGymAccess ? 'text-green-600' : 'text-red-600' }}">
                                         {{ \Carbon\Carbon::parse($member->gym_access_end_date)->format('F j, Y') }}
                                         @if($isActiveGymAccess)
-                                            ({{ (int)abs(\Carbon\Carbon::parse($member->gym_access_end_date)->addDay()->diffInDays(now())) }} days remaining)
+                                            ({{ (int)abs(\Carbon\Carbon::parse($member->gym_access_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                         @else
-                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} days ago)
+                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} day/s ago)
                                         @endif
                                     </p>
                                 @endif
@@ -151,9 +151,9 @@
                                     <p class="font-medium {{ $isActivePT ? 'text-green-600' : 'text-red-600' }}">
                                         {{ \Carbon\Carbon::parse($member->pt_end_date)->format('F j, Y') }}
                                         @if($isActivePT)
-                                            ({{(int)abs(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now())) }} days remaining)
+                                            ({{(int)abs(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                         @else
-                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} days ago)
+                                            (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} day/s ago)
                                         @endif
                                     </p>
                                 @endif
@@ -224,7 +224,7 @@
 
                     <!-- Action Buttons -->
                     <div class="mt-8 flex space-x-2">
-                        <a href="#" data-edit-profile class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        <a href="#" data-edit-profile class="px-4 py-2 bg-black text-white rounded-md hover:bg-black transition-colors">
                             Edit Profile
                         </a>
                         <a href="#" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
@@ -233,15 +233,15 @@
                         <a href="#" data-delete-member class="px-4 py-2 text-white rounded-md hover:bg-red-700 bg-red-600 transition-colors">
                             Delete Member
                         </a>
-                        <a href="{{ route('renew-membership.index', ['renewalType' => 'membership', 'id' => $member->id]) }}" class="px-4 py-2 text-white rounded-md hover:bg-gray-700 bg-black transition-colors">
+                        <!-- <a href="{{ route('renew-membership.index', ['renewalType' => 'membership', 'id' => $member->id]) }}" class="px-4 py-2 text-white rounded-md hover:bg-gray-700 bg-black transition-colors">
                             Renew Membership
                         </a>
                         <a href="{{ route('renew-membership.index', ['renewalType' => 'membership_term', 'id' => $member->id]) }}" class="px-4 py-2 text-white rounded-md hover:bg-gray-700 bg-black transition-colors">
-                            Renew Membership Term
+                            Renew Gym Access
                         </a>
                         <a href="{{ route('renew-membership.index', ['renewalType' => 'personal_trainer', 'id' => $member->id]) }}" class="px-4 py-2 text-white rounded-md hover:bg-gray-700 bg-black transition-colors">
                             Renew Personal Trainer
-                        </a>
+                        </a> -->
                     </div>
                 </div>
             </div>
