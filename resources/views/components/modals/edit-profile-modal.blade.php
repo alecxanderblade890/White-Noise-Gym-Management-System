@@ -101,7 +101,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Membership End Date</label>
                         <input type="date" name="membership_end_date" value="{{ $member->membership_end_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" readonly>
-                    </div>
+                    </div>-->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Gym Access Start Date</label>
                         <input type="date" id="gym_access_start_date" name="gym_access_start_date" value="{{ $member->gym_access_start_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" onchange="calculateMembershipTerm()">
@@ -109,7 +109,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Gym Access End Date</label>
                         <input type="date" id="gym_access_end_date" name="gym_access_end_date" value="{{ $member->gym_access_end_date }}" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" onchange="calculateMembershipTerm()">
-                    </div> -->
+                    </div> 
                     <!-- <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Membership Term (Gym Access)</label>
                         <input type="hidden" id="membership_term_billing_rate_hidden" name="membership_term_billing_rate" value="0">

@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 namespace App\Http\Controllers;
 
@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Member;
 use App\Models\DailyLog;
-use Illuminate\Support\Facades\DB;
 
 class SalesReportController extends Controller
 {
@@ -21,66 +20,117 @@ class SalesReportController extends Controller
         $startDate = Carbon::parse($startDate)->startOfDay();
         $endDate = Carbon::parse($endDate)->endOfDay();
 
-        // Query for memberships created in the date range
-        $memberships = Member::whereBetween('membership_start_date', [$startDate, $endDate])->get();
+        // Initialize counters
+        $membershipCount = 0;
+        $studentMemberships1monthCount = 0;
+        $studentMemberships3monthCount = 0;
+        $regularMemberships1monthCount = 0;
+        $regularMemberships3monthCount = 0;
+        $walkinMembershipsStudentCount = 0;
+        $walkinMembershipsRegularCount = 0;
+        $ptSales1monthCount = 0;
+        $ptSales1dayCount = 0;
+        $walkinsDailyStudentCount = 0;
+        $walkinsDailyRegularCount = 0;
+        $dayPassesCount = 0;
 
-        $studentMemberships1month = Member::whereDate('gym_access_start_date', '>=', $startDate)
-            ->whereDate('gym_access_start_date', '<=', $endDate)
-            ->where('member_type', 'Student')
-            ->where('membership_term_gym_access', '1 month')
-            ->get();
-        $studentMemberships3month = Member::whereDate('gym_access_start_date', '>=', $startDate)
-            ->whereDate('gym_access_start_date', '<=', $endDate)
-            ->where('member_type', 'Student')
-            ->where('membership_term_gym_access', '3 months')
-            ->get();
-        $regularMemberships1month = Member::whereDate('gym_access_start_date', '>=', $startDate)
-            ->whereDate('gym_access_start_date', '<=', $endDate)
-            ->where('member_type', 'Regular')
-            ->where('membership_term_gym_access', '1 month')
-            ->get();
-        $regularMemberships3month = Member::whereDate('gym_access_start_date', '>=', $startDate)
-            ->whereDate('gym_access_start_date', '<=', $endDate)
-            ->where('member_type', 'Regular')
-            ->where('membership_term_gym_access', '3 months')
-            ->get();
+        $gymUseCount = 0;
 
-        $walkinMembershipsStudent = Member::whereDate('gym_access_start_date', '>=', $startDate)
-            ->whereDate('gym_access_start_date', '<=', $endDate)
-            ->where('member_type', 'Student')
-            ->where('membership_term_gym_access', 'Walk in')
-            ->get();
-        $walkinMembershipsRegular = Member::whereDate('gym_access_start_date', '>=', $startDate)
-            ->whereDate('gym_access_start_date', '<=', $endDate)
-            ->where('member_type', 'Regular')
-            ->where('membership_term_gym_access', 'Walk in')
-            ->get();
+        // Initialize amounts
+        $totalMembershipAmount = 0;
+        $totalStudentMemberships1monthAmount = 0;
+        $totalStudentMemberships3monthAmount = 0;
+        $totalRegularMemberships1monthAmount = 0;
+        $totalRegularMemberships3monthAmount = 0;
+        $totalWalkinMembershipsStudentAmount = 0;
+        $totalWalkinMembershipsRegularAmount = 0;
+        $totalPTSales1monthAmount = 0;
+        $totalPTSales1dayAmount = 0;
+        $totalDayPassesAmount = 0;
+        $totalClients = 0;
 
-        $ptSales1month = Member::whereDate('pt_start_date', '>=', $startDate)
-            ->whereDate('pt_start_date', '<=', $endDate)
-            ->where('with_pt', '1 month')
+        // Get all members with payment history in the date range
+        $members = Member::whereNotNull('payment_history')->get();
+
+        foreach ($members as $member) {
+            if (empty($member->payment_history)) {
+                continue;
+            }
+
+            foreach ($member->payment_history as $payment) {
+                // Convert payment date to Carbon for comparison
+                $paymentDate = Carbon::parse($payment['date']);
+
+                // Check if payment is within the date range
+                if ($paymentDate->between($startDate, $endDate)) {
+                    
+                    // Categorize by purpose
+                    if ($payment['amount'] == 500) {
+                        $membershipCount += 1;
+                        $totalMembershipAmount += 500;
+                    } elseif ($payment['amount'] == 1000) {
+                        $studentMemberships1monthCount += 1;
+                        $totalStudentMemberships1monthAmount += 1000;
+                    } elseif ($payment['amount'] == 1500) {
+                        $regularMemberships1monthCount += 1;
+                        $totalRegularMemberships1monthAmount += 1500;
+                    } elseif ($payment['amount'] == 2500) {
+                        $studentMemberships3monthCount += 1;
+                        $totalStudentMemberships3monthAmount += 2500;
+                    } elseif ($payment['amount'] == 4000) {
+                        $regularMemberships3monthCount += 1;
+                        $totalRegularMemberships3monthAmount += 4000;
+                    } elseif ($payment['amount'] == 3000) {
+                        $ptSales1monthCount += 1;
+                        $totalPTSales1monthAmount += 3000;
+                    }
+                }
+            }
+        }
+
+        $gymUseCount = DailyLog::whereDate('date', '>=', $startDate)
+            ->whereDate('date', '<=', $endDate)
+            ->whereJsonContains('purpose_of_visit', 'Gym Use')
             ->get();
+        $gymUseCount = $gymUseCount->count();
+
+        // Daily Logs for PT and Walk-ins
         $ptSales1day = DailyLog::whereDate('date', '>=', $startDate)
             ->whereDate('date', '<=', $endDate)
             ->whereJsonContains('purpose_of_visit', 'Personal Trainer 1 Day')
             ->get();
+        $ptSales1dayCount = $ptSales1day->count();
+        $totalPTSales1dayAmount = $ptSales1dayCount * 300;
+
         $walkinsDailyStudent = DailyLog::whereDate('date', '>=', $startDate)
             ->whereDate('date', '<=', $endDate)
             ->where('gym_access', 'Walk in')
             ->where('member_type', 'Student')
             ->whereJsonContains('purpose_of_visit', 'Gym Use')
             ->get();
+        $walkinsDailyStudentCount = $walkinsDailyStudent->count();
+        $totalWalkinsDailyStudentAmount = $walkinsDailyStudentCount * 100;
+
         $walkinsDailyRegular = DailyLog::whereDate('date', '>=', $startDate)
             ->whereDate('date', '<=', $endDate)
             ->where('gym_access', 'Walk in')
             ->where('member_type', 'Regular')
             ->whereJsonContains('purpose_of_visit', 'Gym Use')
             ->get();
+        $walkinsDailyRegularCount = $walkinsDailyRegular->count();
+        $totalWalkinsDailyRegularAmount = $walkinsDailyRegularCount * 150;
     
         $dayPasses = DailyLog::whereDate('date', '>=', $startDate)
             ->whereDate('date', '<=', $endDate)
-            ->whereJsonContains('purpose_of_visit', 'AA')
+            ->whereJsonContains('purpose_of_visit', 'Gym Use (Day Pass)')
             ->get();
+
+        $totalClients = DailyLog::whereDate('date', '>=', $startDate)
+            ->whereDate('date', '<=', $endDate)
+            ->get()->count();
+            
+        $dayPassesCount = $dayPasses->count();
+        $totalDayPassesAmount = $dayPassesCount * 200;
 
         $itemPrices = [
             'Pocari Sweat' => 50,
@@ -116,51 +166,22 @@ class SalesReportController extends Controller
             }
         }
 
-        $membershipCount = $memberships->count();
-        $studentMembershipsCount = $studentMemberships1month->count();
-        $studentMemberships3monthCount = $studentMemberships3month->count();
-        $regularMembershipsCount = $regularMemberships1month->count();
-        $regularMemberships3monthCount = $regularMemberships3month->count();
-        $walkinMembershipsStudentCount = $walkinMembershipsStudent->count();
-        $walkinMembershipsRegularCount = $walkinMembershipsRegular->count();
-        $ptSales1monthCount = $ptSales1month->count();
-        $ptSales1dayCount = $ptSales1day->count();
-        $walkinsDailyStudentCount = $walkinsDailyStudent->count();
-        $walkinsDailyRegularCount = $walkinsDailyRegular->count();
-        $dayPassesCount = $dayPasses->count();
-
-        $totalMembershipAmount = $membershipCount * 500;
-        $totalStudentMemberships1monthAmount = $studentMemberships1month->count() * 1000;
-        $totalStudentMemberships3monthAmount = $studentMemberships3month->count() * 2500;
-        $totalRegularMemberships1monthAmount = $regularMemberships1month->count() * 1500;
-        $totalRegularMemberships3monthAmount = $regularMemberships3month->count() * 4500;
-
-        $totalWalkinMembershipsStudentAmount = $walkinMembershipsStudent->count() * 100;
-        $totalWalkinMembershipsRegularAmount = $walkinMembershipsRegular->count() * 150;
-
-        $totalWalkinsDailyStudentAmount = $walkinsDailyStudent->count() * 100;
-        $totalWalkinsDailyRegularAmount = $walkinsDailyRegular->count() * 150;
-
-        $totalPTSales1monthAmount = $ptSales1month->count() * 3000;
-        $totalPTSales1dayAmount = $ptSales1day->count() * 300;
-
-        $totalDayPassesAmount = $dayPasses->count() * 200;
-
         $totalAmount = $totalMembershipAmount + $totalStudentMemberships1monthAmount + $totalStudentMemberships3monthAmount + $totalRegularMemberships1monthAmount + $totalRegularMemberships3monthAmount + $totalWalkinMembershipsStudentAmount + $totalWalkinMembershipsRegularAmount + $totalPTSales1monthAmount + $totalPTSales1dayAmount + $totalItemsSalesAmount + $totalWalkinsDailyStudentAmount + $totalWalkinsDailyRegularAmount + $totalDayPassesAmount;
-        $totalClients = $membershipCount + $studentMembershipsCount + $studentMemberships3monthCount + $regularMembershipsCount + $regularMemberships3monthCount + $walkinMembershipsStudentCount + $walkinMembershipsRegularCount + $ptSales1monthCount + $ptSales1dayCount + $walkinsDailyStudentCount + $walkinsDailyRegularCount + $dayPassesCount;
+        $totalClients += $dayPassesCount;
 
         return view('pages.sales-report', [
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
             'membershipCount' => $membershipCount,
-            'studentMembershipsCount' => $studentMembershipsCount,
+            'studentMembershipsCount' => $studentMemberships1monthCount,
             'studentMemberships3monthCount' => $studentMemberships3monthCount,
-            'regularMembershipsCount' => $regularMembershipsCount,
+            'regularMembershipsCount' => $regularMemberships1monthCount,
             'regularMemberships3monthCount' => $regularMemberships3monthCount,
             'walkinMembershipsStudentCount' => $walkinMembershipsStudentCount + $walkinsDailyStudentCount,
             'walkinMembershipsRegularCount' => $walkinMembershipsRegularCount + $walkinsDailyRegularCount,
             'ptSales1monthCount' => $ptSales1monthCount,
             'ptSales1dayCount' => $ptSales1dayCount,
+            'gymUseCount' => $gymUseCount,
             'totalMembershipAmount' => $totalMembershipAmount,
             'totalStudentMemberships1monthAmount' => $totalStudentMemberships1monthAmount,
             'totalStudentMemberships3monthAmount' => $totalStudentMemberships3monthAmount,
@@ -178,4 +199,53 @@ class SalesReportController extends Controller
             'totalClients' => $totalClients,
         ]);
     }
+    // public function updatePaymentHistory()
+    // {
+    //     $members = Member::all();
+
+    //     foreach ($members as $member) {
+    //         $paymentHistory = $member->payment_history;
+
+    //         if($member->membership_start_date){
+    //             $paymentHistory[] = [
+    //                 'date' => $member->membership_start_date,
+    //                 'purpose' => 'New Membership',
+    //                 'amount' => 500,
+    //             ];
+    //         }
+
+    //         // Check if member has gym access
+    //         if ($member->gym_access_start_date) {
+
+    //             $purpose = '';
+    //             $amount = 0;
+
+    //             if($member->membership_term_gym_access == '1 month'){
+    //                 $purpose = 'Gym Access 1 month';
+    //                 $amount = $member->member_type == 'Student' ? 1000 : 1500;
+    //             }
+    //             else if($member->membership_term_gym_access == '3 months'){
+    //                 $purpose = 'Gym Access 3 months';
+    //                 $amount = $member->member_type == 'Student' ? 2500 : 4000;
+    //             }
+    //             // Add gym membership to payment history
+    //             $paymentHistory[] = [
+    //                 'date' => $member->gym_access_start_date,
+    //                 'purpose' => $purpose,
+    //                 'amount' => $amount,
+    //             ];
+    //         }
+
+    //         // Check if member has PT
+    //         if ($member->with_pt && $member->pt_start_date) {
+    //             // Add PT to payment history
+    //             $paymentHistory[] = [
+    //                 'date' => $member->pt_start_date,
+    //                 'purpose' => 'Personal Training 1 month',
+    //                 'amount' => 3000,
+    //             ];
+    //         }
+    //         $member->update(['payment_history' => $paymentHistory]);
+    //     }
+    // }
 }

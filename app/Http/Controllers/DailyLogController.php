@@ -12,7 +12,6 @@ use Carbon\Carbon;
 
 class DailyLogController extends Controller
 {
-
     public function addDailyLog(Request $request)
     {
         try {
@@ -37,6 +36,15 @@ class DailyLogController extends Controller
                 'items' => 'nullable|array',
                 'notes' => 'nullable|string'
             ]); 
+
+            // if($validated['payment_amount'] > 0)
+            // {
+            //     $validated['payment_method'] = 'required|in:Cash,GCash,Bank Transfer';
+            // }
+            // else
+            // {
+            //     $validated['payment_method'] = 'required|in:None,Cash,GCash,Bank Transfer';
+            // }
             // Get the member first
             $member = Member::where('white_noise_id', $validated['white_noise_id_form'])->first();
 
@@ -109,7 +117,7 @@ class DailyLogController extends Controller
             $isRemoveGymAccess = in_array('Remove Gym Access', $purposeOfVisit);
             $isRemovePT = in_array('Remove Personal Trainer', $purposeOfVisit);
 
-            $paymentHistory = json_decode($member->payment_history, true) ?? [];
+            $paymentHistory = $member->payment_history ?? [];
 
             if ($isRenewMembership) {
                 $member->update([
@@ -127,6 +135,7 @@ class DailyLogController extends Controller
             } 
             // Handle new gym access or renewals
             elseif ($isGymAccess || $isRenewGymAccess) {
+
                 $updates = ['gym_access_start_date' => now()->toDateString()];
                 
                 if ($validated['gym_access'] === 'Walk in') {
@@ -150,7 +159,7 @@ class DailyLogController extends Controller
                 }
                 else if($validated['gym_access'] === '3 months'){
                     $newPaymentPurpose = 'Gym Access 3 months';
-                    $newPaymentAmount = $validated['member_type'] === 'Student' ? 2500: 4500; // Example amount for 3 months
+                    $newPaymentAmount = $validated['member_type'] === 'Student' ? 2500: 4000; // Example amount for 3 months
                 }
                 $newPayment = [
                     'date' => now()->toDateString(), // Use the current date
@@ -161,7 +170,7 @@ class DailyLogController extends Controller
                 // Append the new payment to the array
                 $paymentHistory[] = $newPayment;
                 // Re-encode the array back to JSON and add it to the validated data
-                $updates['payment_history'] = json_encode($paymentHistory);
+                $updates['payment_history'] = $paymentHistory;
                 
                 $member->update($updates);
             }
@@ -187,7 +196,7 @@ class DailyLogController extends Controller
                     'pt_end_date' => $isExpired 
                         ? now()->addDays(30)->toDateString() 
                         : $currentEndDate->addDays(30)->toDateString(),
-                    'payment_history' => json_encode($paymentHistory),
+                    'payment_history' => $paymentHistory,
                 ]);
             }
 

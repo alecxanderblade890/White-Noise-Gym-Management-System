@@ -108,6 +108,13 @@
                             <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($ptSales1monthCount ?? 0) }}</td>
                             <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">₱ {{ number_format($totalPTSales1monthAmount ?? 0, 2) }}</td>
                         </tr>
+                        <tr class="bg-gray-50">
+                            <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Gym Use</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 pl-10">Walk-in (Gym Access)</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ number_format($gymUseCount ?? 0) }}</td>
+                        </tr>
                          <!-- Item Sales Section -->
                          <tr class="bg-gray-50">
                             <td colspan="3" class="px-6 py-3 font-semibold text-gray-700">Item Sales</td>

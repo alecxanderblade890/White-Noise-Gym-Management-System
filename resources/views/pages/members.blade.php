@@ -99,7 +99,7 @@
                             @elseif($member->membership_term_gym_access == '1 month')
                                 <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type == 'Student' ? '₱1000/Month' : '₱1500/Month' }}</td>
                             @elseif($member->membership_term_gym_access == '3 months')
-                                <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type == 'Student' ? '₱2500/3 Months' : '₱4500/3 Months' }}</td>
+                                <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type == 'Student' ? '₱2500/3 Months' : '₱4000/3 Months' }}</td>
                             @elseif($member->membership_term_gym_access == 'Walk in')
                                 <td class="py-3 px-6 text-left whitespace-nowrap">{{ $member->member_type == 'Student' ? '₱100/day' : '₱150/day' }}</td>
                             @endif

@@ -201,7 +201,7 @@ function updatePaymentTotal() {
                 totalAmount += isStudent ? 1000 : 1500;
             }
             else if (gymAccessValue.includes('3 month')) {
-                totalAmount += isStudent ? 2500 : 4500;
+                totalAmount += isStudent ? 2500 : 4000;
             }
             else if (gymAccessValue.includes('Walk in')) {
                 totalAmount += isStudent ? 100 : 150;

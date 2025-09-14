@@ -42,6 +42,11 @@ class Member extends Model
         'weight_kg',
         'height_cm',
         'notes',
+        'payment_history',
+    ];
+
+    protected $casts = [
+        'payment_history' => 'array',
     ];
 
     public function dailyLogs(): HasMany

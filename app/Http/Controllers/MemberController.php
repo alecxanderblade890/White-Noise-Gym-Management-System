@@ -182,7 +182,7 @@ class MemberController extends Controller
 
             // Add the first payment
             $paymentHistory[] = ['date' => $membershipStartDate, 'purpose' => 'New Membership', 'amount' => 500];
-
+           
             if($validated['gym_access_start_date'] !== null){
                 $amount = 0;
                 $purpose = '';
@@ -227,7 +227,7 @@ class MemberController extends Controller
                 'emergency_contact_person' => $validated['emergency_contact_person'],
                 'emergency_contact_number' => $validated['emergency_contact_number'],
                 'notes' => $validated['notes'] ?? null,
-                'payment_history' => json_encode($paymentHistory),
+                'payment_history' => $paymentHistory,
             ]);
 
         } catch (ValidationException $e) {

@@ -100,7 +100,7 @@ function updateMembershipTermBillingRate() {
     else if (membershipTerm.value === '1 month') {
         rate = (memberType.value === 'Student') ? 1000 : 1500;
     } else if (membershipTerm.value === '3 months') {
-        rate = (memberType.value === 'Student') ? 2500 : 4500;
+        rate = (memberType.value === 'Student') ? 2500 : 4000;
     } else if (membershipTerm.value === 'Walk in') {
         rate = (memberType.value === 'Student') ? 100 : 150;
     }

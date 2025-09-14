@@ -47,6 +47,10 @@
                             <span class="font-medium ml-2">{{ $totalClientsToday }}</span>
                         </div>
                         <div class="flex text-gray-700">
+                            <span>Total Walk-in Sales Today:</span>
+                            <span class="font-medium ml-2">₱ {{ number_format($totalWalkinSalesTodayAmount, 2)}} </span>
+                        </div>
+                        <div class="flex text-gray-700">
                             <span>Total Items Sold Today:</span>
                             <span class="font-medium ml-2">₱ {{ number_format($totalItemsSalesAmount, 2)}} ({{$totalItemsSalesCount}}) </span>
                         </div>
@@ -409,39 +413,39 @@
                                         -> 
                                         {{ $member->membership_end_date ? \Carbon\Carbon::parse($member->membership_end_date)->format('M d, Y') : 'N/A' }}
                                         <br>
-                                        <p class="font-medium {{ $member->membership_start_date != null ? ($isActiveMembership ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">
+                                        <!-- <p class="font-medium {{ $member->membership_start_date != null ? ($isActiveMembership ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">
                                         @if($member->membership_start_date != null && $isActiveMembership)
                                             ({{ (int)abs(\Carbon\Carbon::parse($member->membership_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                         @elseif($member->membership_start_date != null && !$isActiveMembership)
                                             (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} day/s ago)
                                         @endif
-                                        </p>
+                                        </p> -->
                                     </td>
                                     <td class="px-3 py-4 whitespace-nowrap text-sm hidden sm:table-cell {{ $member->gym_access_start_date != null ? ($isActiveGymAccess ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">
                                         {{ $member->gym_access_start_date ? \Carbon\Carbon::parse($member->gym_access_start_date)->format('M d, Y') : 'N/A' }} 
                                         -> 
                                         {{ $member->gym_access_end_date ? \Carbon\Carbon::parse($member->gym_access_end_date)->format('M d, Y') : 'N/A' }}
                                         <br>
-                                        <p class="font-medium {{ $member->gym_access_start_date != null ? ($isActiveGymAccess ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">
+                                        <!-- <p class="font-medium {{ $member->gym_access_start_date != null ? ($isActiveGymAccess ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">
                                         @if($member->gym_access_start_date != null && $isActiveGymAccess)
                                             ({{ (int)abs(\Carbon\Carbon::parse($member->gym_access_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                         @elseif($member->gym_access_start_date != null && !$isActiveGymAccess)
                                             (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} day/s ago)
                                         @endif
-                                        </p>
+                                        </p> -->
                                     </td>
                                     <td class="px-3 py-4 whitespace-nowrap text-sm hidden sm:table-cell {{ $member->pt_start_date != null ? ($isActivePT ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">
                                         {{ $member->pt_start_date ? \Carbon\Carbon::parse($member->pt_start_date)->format('M d, Y') : 'N/A' }} 
                                         -> 
                                         {{ $member->pt_end_date ? \Carbon\Carbon::parse($member->pt_end_date)->format('M d, Y') : 'N/A' }}
                                         <br>
-                                        <p class="font-medium {{ $member->pt_start_date != null ? ($isActivePT ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">  
+                                        <!-- <p class="font-medium {{ $member->pt_start_date != null ? ($isActivePT ? 'text-green-600' : 'text-red-600') : 'text-gray-600' }}">  
                                         @if($member->pt_start_date != null && $isActivePT)
                                             ({{ (int)abs(\Carbon\Carbon::parse($member->pt_end_date)->addDay()->diffInDays(now())) }} day/s remaining)
                                         @elseif($member->pt_start_date != null && !$isActivePT)
                                             (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} day/s ago)
                                         @endif
-                                        </p>
+                                        </p> -->
                                     </td>
                                 </tr>
                             @empty
@@ -456,6 +460,12 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <!-- Add pagination links for members expiring -->
+                    @if($membersExpiring->hasPages())
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+                        {{ $membersExpiring->links() }}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -524,7 +534,7 @@
                                         -> 
                                         {{ $member->membership_end_date ? \Carbon\Carbon::parse($member->membership_end_date)->format('M d, Y') : 'N/A' }}
                                         <br>
-                                        @if($member->membership_start_date != null)
+                                        <!-- @if($member->membership_start_date != null)
                                             @if($isMembershipExpired)
                                                 <span class="font-medium text-red-600">
                                                     (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date))) }} day/s ago)
@@ -534,7 +544,7 @@
                                                     ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->membership_end_date)))}} day/s remaining)
                                                 </span>
                                             @endif
-                                        @endif
+                                        @endif -->
                                     </td>
                                     
                                     <td class="px-3 py-4 whitespace-nowrap text-sm {{ $member->gym_access_start_date != null ? ($isGymAccessExpired ? 'text-red-600' : 'text-green-600') : 'text-gray-600' }}">
@@ -542,7 +552,7 @@
                                         -> 
                                         {{ $member->gym_access_end_date ? \Carbon\Carbon::parse($member->gym_access_end_date)->format('M d, Y') : 'N/A' }}
                                         <br>
-                                        @if($member->gym_access_start_date != null)
+                                        <!-- @if($member->gym_access_start_date != null)
                                             @if($isGymAccessExpired)
                                                 <span class="font-medium text-red-600">
                                                     (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date))) }} day/s ago)
@@ -552,7 +562,7 @@
                                                     ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->gym_access_end_date)))}} day/s remaining)
                                                 </span>
                                             @endif
-                                        @endif
+                                        @endif -->
                                     </td>
                                     
                                     <td class="px-3 py-4 whitespace-nowrap text-sm {{ $member->pt_start_date != null ? ($isPTExpired ? 'text-red-600' : 'text-green-600') : 'text-gray-600' }}">
@@ -560,7 +570,7 @@
                                         -> 
                                         {{ $member->pt_end_date ? \Carbon\Carbon::parse($member->pt_end_date)->format('M d, Y') : 'N/A' }}
                                         <br>
-                                        @if($member->pt_start_date != null)
+                                        <!-- @if($member->pt_start_date != null)
                                             @if($isPTExpired)
                                                 <span class="font-medium text-red-600">
                                                     (Expired {{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date))) }} day/s ago)
@@ -570,7 +580,7 @@
                                                     ({{ (int)abs(now()->diffInDays(\Carbon\Carbon::parse($member->pt_end_date)))}} day/s remaining)
                                                 </span>
                                             @endif
-                                        @endif
+                                        @endif -->
                                     </td>
                                 </tr>
                             @empty
@@ -585,6 +595,12 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <!-- Add pagination links for expired members -->
+                    @if($membersExpired->hasPages())
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+                        {{ $membersExpired->links() }}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

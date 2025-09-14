@@ -62,24 +62,72 @@ class DashboardController extends Controller
                 ->where('payment_method', 'Bank Transfer')
                 ->sum('payment_amount');
 
-            $totalClientsToday = DailyLog::whereDate('date', $today)->count();
-            $totalNewMemberships = Member::whereDate('membership_start_date', $today)->count();
-            $totalNewGymAccess = Member::whereDate('gym_access_start_date', $today)->count();
-            
-            // Calculate total new gym access amount based on membership type and term
-            $totalNewGymAccessAmount = Member::whereDate('gym_access_start_date', $today)
-                ->get()
-                ->sum(function($member) {
-                    if ($member->membership_term_gym_access === '1 month') {
-                        return $member->member_type === 'Student' ? 1000 : 1500;
-                    } elseif ($member->membership_term_gym_access === '3 months') {
-                        return $member->member_type === 'Student' ? 2500 : 4500;
-                    }elseif ($member->membership_term_gym_access === 'Walk in') {
-                        return $member->member_type === 'Student' ? 100 : 150;
-                    }
-                    return 0;
-                });
+            $totalClientsToday = DailyLog::whereDate('date', $today)
+                ->select('white_noise_id')
+                ->distinct()
+                ->count();
+
+            $totalWalkinSalesTodayStudent = DailyLog::whereDate('date', $today)
+                ->where('gym_access', 'Walk in')
+                ->whereJsonContains('purpose_of_visit', 'Gym Use')
+                ->where('member_type', 'Student')
+                ->get();
                 
+            $totalWalkinSalesTodayRegular = DailyLog::whereDate('date', $today)
+                ->where('gym_access', 'Walk in')
+                ->whereJsonContains('purpose_of_visit', 'Gym Use')
+                ->where('member_type', 'Regular')
+                ->get();
+                
+            $totalWalkinSalesTodayStudentCount = $totalWalkinSalesTodayStudent->count();
+            $totalWalkinSalesTodayRegularCount = $totalWalkinSalesTodayRegular->count();
+            
+            $totalWalkinSalesTodayStudentAmount = $totalWalkinSalesTodayStudentCount * 100;
+            $totalWalkinSalesTodayRegularAmount = $totalWalkinSalesTodayRegularCount * 150;
+
+            $totalWalkinSalesTodayAmount = $totalWalkinSalesTodayStudentAmount + $totalWalkinSalesTodayRegularAmount;
+            
+            $totalNewMemberships = Member::whereDate('membership_start_date', $today)->count();
+            
+            // Count new gym access based on payment dates
+            $totalNewGymAccess = 0;
+            $members = Member::whereNotNull('payment_history')->get();
+            
+            foreach ($members as $member) {
+                if (empty($member->payment_history)) {
+                    continue;
+                }
+
+                foreach ($member->payment_history as $payment) {
+                    $paymentDate = Carbon::parse($payment['date']);
+                    if ($paymentDate->isToday() && 
+                        in_array($payment['amount'], [1000, 1500, 2500, 4000])) {
+                        $totalNewGymAccess++;
+                        break; // Count each member only once per day
+                    }
+                }
+            }
+
+            // Calculate total new gym access amount based on payment history
+            $totalNewGymAccessAmount = 0;
+            $members = Member::whereNotNull('payment_history')->get();
+            
+            foreach ($members as $member) {
+                if (empty($member->payment_history)) {
+                    continue;
+                }
+
+                foreach ($member->payment_history as $payment) {
+                    $paymentDate = Carbon::parse($payment['date']);
+                    if ($paymentDate->isToday()) {
+                        $amount = $payment['amount'];
+                        if (in_array($amount, [1000, 1500, 2500, 4000])) {
+                            $totalNewGymAccessAmount += $amount;
+                        }
+                    }
+                }
+            }
+            
             $totalNewPersonalTrainer = Member::whereDate('pt_start_date', $today)->count();
             // Get current date and 7 days from now
             $now = Carbon::now();
@@ -99,7 +147,7 @@ class DashboardController extends Controller
                     ->where('pt_end_date', '<=', $sevenDaysFromNow);
                 });
             })->orderBy('membership_end_date', 'asc')
-            ->get();
+            ->paginate(5);
 
             $membersExpired = Member::where(function($query) use ($now) {
                 // Show members where any membership type is expired
@@ -107,7 +155,7 @@ class DashboardController extends Controller
                     ->orWhere('gym_access_end_date', '<', $now)
                     ->orWhere('pt_end_date', '<', $now);
             })->orderBy('membership_end_date', 'asc')
-            ->get();
+            ->paginate(5);
 
             return view('pages.dashboard', [
                 'totalSalesToday'       => $totalSalesToday,
@@ -118,6 +166,7 @@ class DashboardController extends Controller
                 'totalNewMemberships'   => $totalNewMemberships,
                 'totalNewGymAccess'     => $totalNewGymAccess,
                 'totalNewGymAccessAmount' => $totalNewGymAccessAmount,
+                'totalWalkinSalesTodayAmount' => $totalWalkinSalesTodayAmount,
                 'totalNewPersonalTrainer' => $totalNewPersonalTrainer,
                 'totalItemsSalesAmount' => $totalItemsSalesAmount,
                 'totalItemsSalesCount' => $totalItemsSalesCount,
